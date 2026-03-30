@@ -738,10 +738,20 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
   const fetchReport=async(id)=>{
     setLoading(true);setFetchError('');
     try{
-      const{data,error}=await supabase.from('reports').select('case_id,status,created_at').eq('case_id',id).limit(1).single();
-      if(error||!data){setCaseData(false);}
-      else{setCaseData(data);}
-    }catch(e){setFetchError('Network error.');setCaseData(false);}
+      const{data,error}=await supabase.from('reports').select('case_id,status,created_at').eq('case_id',id);
+      if(error){
+        console.error('Supabase select error:', error);
+        setCaseData(false);
+      } else if(data&&data.length>0){
+        setCaseData(data[0]);
+      } else {
+        setCaseData(false);
+      }
+    }catch(e){
+      console.error('fetchReport exceptions:', e);
+      setFetchError('Network error.');
+      setCaseData(false);
+    }
     setLoading(false);
   };
 
