@@ -225,7 +225,8 @@ function generateEvidenceId(){
 
 // ═══════════════════════════════════════════════════════════════════
 function ComplaintPage({onBack}){
-  const[form,setForm]=useState({type:'',description:'',otherDesc:'',date:'',time:'',evidence:[]});
+  const now=new Date();const nowDate=now.toISOString().slice(0,10);const nowTime=now.toTimeString().slice(0,5);
+  const[form,setForm]=useState({type:'',description:'',otherDesc:'',date:nowDate,time:nowTime,evidence:[]});
   const[submitted,setSubmitted]=useState(false);const[trackingId,setTrackingId]=useState('');
   const[submitting,setSubmitting]=useState(false);
   const[pinningLocation,setPinningLocation]=useState(false);
@@ -280,7 +281,8 @@ function ComplaintPage({onBack}){
     }catch(e){console.warn('[SafeTrace] Submit error:',e);}
     setTrackingId(caseId);setSubmitted(true);setSubmitting(false);
   };
-  const handleNewReport=()=>{setSubmitted(false);setTrackingId('');setForm({type:'',description:'',otherDesc:'',date:'',time:'',evidence:[]});setPinnedLocation(null);setPinningLocation(false);};
+  const n2=new Date();const n2Date=n2.toISOString().slice(0,10);const n2Time=n2.toTimeString().slice(0,5);
+  const handleNewReport=()=>{setSubmitted(false);setTrackingId('');setForm({type:'',description:'',otherDesc:'',date:n2Date,time:n2Time,evidence:[]});setPinnedLocation(null);setPinningLocation(false);};
 
   const incidentTypes=['Harassment','Stalking','Theft / Robbery','Assault','Eve-Teasing','Unsafe Area','Poor Lighting','Other'];
   const canSubmit=form.type&&pinnedLocation&&form.date&&form.time&&(form.type!=='Other'||form.otherDesc)&&!submitting;
@@ -821,9 +823,9 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
   function handleReset(){setPin(null);setNearby([]);setDest(null);setRouteData(null);setNavigating(false);setStepIndex(0);setLoading(false);setShowArrival(false);}
   function handleChangeDest(){setDest(null);setRouteData(null);setNavigating(false);setStepIndex(0);}
 
-  const safeCount=safePlaces.filter(p=>p.tags[0]==='police'||p.tags[0]==='hospital').length;
-  const riskHigh=unsafeZones.filter(z=>z.risk>=0.75).length;
-  const riskTotal=unsafeZones.length;
+  const safeCount=pin?safePlaces.filter(p=>(p.tags[0]==='police'||p.tags[0]==='hospital')&&haversine(pin,p)<=1000).length:safePlaces.filter(p=>p.tags[0]==='police'||p.tags[0]==='hospital').length;
+  const riskHigh=pin?unsafeZones.filter(z=>z.risk>=0.75&&haversine(pin,{lat:z.lat,lng:z.lng})<=1000).length:unsafeZones.filter(z=>z.risk>=0.75).length;
+  const riskTotal=pin?unsafeZones.filter(z=>haversine(pin,{lat:z.lat,lng:z.lng})<=1000).length:unsafeZones.length;
 
   return(
     <div style={{height:'100%',width:'100%',position:'relative',background:'#07070e'}}>
@@ -848,40 +850,14 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
       {mapReady&&<LeafletMap pin={pin} onMapClick={handlePinDrop} nearby={nearby} safePlaces={safePlaces} dest={dest} routeData={routeData} navigating={navigating} stepIndex={stepIndex} showUnsafe={showUnsafe} unsafeZones={unsafeZones}/>}
       {!mapReady&&<div style={{height:'100%',display:'flex',alignItems:'center',justifyContent:'center',color:'#ffffff28',fontFamily:"'Poppins',sans-serif",fontSize:13}}><span style={{animation:'spin 1s linear infinite',display:'inline-block',marginRight:10}}>◌</span>Loading map...</div>}
 
-      {/* ── Welcome guide (before pin drop) ────────────────── */}
-      {!pin&&mapReady&&!navigating&&(
-        <div style={{position:'absolute',bottom:84,left:0,right:0,zIndex:800,padding:'0 16px',pointerEvents:'none',animation:'fadeUp 0.5s ease both'}}>
-          <div style={{background:'rgba(7,7,14,0.94)',border:'1px solid #ffffff0a',borderRadius:20,padding:'18px 20px',backdropFilter:'blur(16px)'}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
-              <div style={{width:36,height:36,borderRadius:12,background:'#e8185012',border:'1px solid #e8185028',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,flexShrink:0}}>📍</div>
-              <div>
-                <div style={{fontSize:14,fontWeight:700,color:'#fff',fontFamily:"'Poppins',sans-serif"}}>Drop your pin to get started</div>
-                <div style={{fontSize:11,color:'#ffffff33',fontFamily:"'Poppins',sans-serif",marginTop:1}}>Tap anywhere on the map</div>
-              </div>
-            </div>
-            <div style={{display:'flex',flexDirection:'column',gap:8}}>
-              {[
-                {icon:'🛡️',text:'We\'ll find safe places near you like police stations, hospitals & public areas'},
-                {icon:'⚠️',text:'Risk zones and crime-prone areas will light up around your location'},
-                {icon:'🗺️',text:'Get walking directions to the nearest safe spot with turn-by-turn navigation'},
-              ].map((item,i)=>(
-                <div key={i} style={{display:'flex',gap:10,alignItems:'flex-start'}}>
-                  <span style={{fontSize:13,flexShrink:0,marginTop:1}}>{item.icon}</span>
-                  <span style={{fontSize:11,color:'#ffffff44',fontFamily:"'Poppins',sans-serif",lineHeight:1.5}}>{item.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Quick-stat cards (AFTER pin drop, before selecting dest) ── */}
       {pin&&!dest&&!navigating&&mapReady&&(
         <div style={{position:'absolute',top:52,left:0,right:0,zIndex:799,padding:'0 12px',pointerEvents:'none',animation:'fadeUp 0.4s ease both'}}>
           <div style={{display:'flex',gap:8}}>
             {[
-              {icon:'🛡️',value:`${safeCount}`,sub:'Safe spots nearby',color:'#34d399'},
-              {icon:'⚠️',value:`${riskTotal}`,sub:`${riskHigh} high risk zones`,color:'#ff2d55'},
+              {icon:'🛡️',value:`${safeCount}`,sub:'Safe spots in 1km',color:'#34d399'},
+              {icon:'⚠️',value:`${riskTotal}`,sub:`${riskHigh} high risk in 1km`,color:'#ff2d55'},
               {icon:'📡',value:'Live',sub:'Monitoring active',color:'#38bdf8'},
             ].map((card,i)=>(
               <div key={i} style={{
@@ -929,7 +905,26 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
 // ═══════════════════════════════════════════════════════════════════
 export default function App(){
   const[page,setPage]=useState('landing');const[showSOS,setShowSOS]=useState(false);const[sosAnim,setSosAnim]=useState(false);
-  const triggerSOS=()=>{setSosAnim(true);setTimeout(()=>setSosAnim(false),700);setShowSOS(v=>!v);};
+  const triggerSOS=()=>{
+    setSosAnim(true);setTimeout(()=>setSosAnim(false),700);
+    // Get current location, then dial police + share via SMS
+    const dial=()=>{ window.location.href='tel:100'; };
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        pos=>{
+          const{latitude:lat,longitude:lng}=pos.coords;
+          const mapsLink=`https://maps.google.com/?q=${lat},${lng}`;
+          const smsBody=encodeURIComponent(`EMERGENCY! I need police help. My location: ${mapsLink}`);
+          // Open SMS to police PCR number first, then dial 100
+          try{window.open(`sms:100?body=${smsBody}`,'_self');}catch(e){}
+          setTimeout(()=>dial(),800);
+        },
+        ()=>dial(), // If location denied, just dial
+        {timeout:3000,enableHighAccuracy:true}
+      );
+    }else{dial();}
+    setShowSOS(v=>!v);
+  };
   return(<PhoneFrame><Styles/>
     {page==='landing'&&<LandingPage onEnter={()=>setPage('home')}/>}
     {page==='home'&&<MapPage activeTab="map" onSOS={triggerSOS} onComplaint={()=>setPage('complaint')} onMap={()=>{}} onTrack={()=>setPage('track')} showSOS={showSOS} sosAnim={sosAnim}/>}
