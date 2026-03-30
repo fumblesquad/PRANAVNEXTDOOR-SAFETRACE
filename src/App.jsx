@@ -413,6 +413,9 @@ function ComplaintPage({onBack}){
 function NavOverlay({steps,stepIndex,setStepIndex,totalDist,totalTime,destName,onEnd}){
   const step=steps[stepIndex],next=steps[stepIndex+1],isFirst=stepIndex===0,isLast=stepIndex===steps.length-1;
   const pct=steps.length>1?(stepIndex/(steps.length-1))*100:100,dir=getDir(step),ndir=next?getDir(next):null;
+  const remDistM=steps.slice(stepIndex).reduce((a,s)=>a+(s.distanceM||0),0);
+  const remDist=remDistM>1000?(remDistM/1000).toFixed(1)+' km':Math.round(remDistM)+' m';
+  const remTime=stepIndex===0?totalTime:(Math.max(1,Math.ceil(remDistM/80))+' min');
   return(<div style={{position:'absolute',inset:0,zIndex:1000,display:'flex',flexDirection:'column',pointerEvents:'none'}}>
     <div style={{pointerEvents:'all',margin:'10px 12px 0',background:'rgba(7,7,14,0.97)',border:'1px solid #e8185055',borderRadius:18,padding:'14px 16px 12px',backdropFilter:'blur(24px)',boxShadow:'0 12px 48px rgba(232,24,80,0.22)',animation:'navIn 0.35s cubic-bezier(0.34,1.4,0.64,1)',fontFamily:"'DM Mono',monospace"}}>
       <div style={{height:3,background:'#ffffff08',borderRadius:2,marginBottom:12,overflow:'hidden'}}><div style={{height:'100%',width:`${pct}%`,background:'linear-gradient(90deg,#e81850,#ff6090)',borderRadius:2,transition:'width 0.6s',boxShadow:'0 0 8px #e81850'}}/></div>
@@ -429,7 +432,7 @@ function NavOverlay({steps,stepIndex,setStepIndex,totalDist,totalTime,destName,o
       </div>
     </div>
     <div style={{pointerEvents:'all',margin:'auto 12px 80px',background:'rgba(7,7,14,0.88)',border:'1px solid #ffffff0a',borderRadius:14,padding:'8px 16px',backdropFilter:'blur(16px)',display:'flex',fontFamily:"'DM Mono',monospace"}}>
-      {[{l:'DIST',v:totalDist},{l:'TIME',v:totalTime},{l:'LEFT',v:`${steps.length-stepIndex}`}].map((x,i,a)=><div key={x.l} style={{flex:1,textAlign:'center',borderRight:i<a.length-1?'1px solid #ffffff0a':'none',padding:'0 6px'}}><div style={{fontSize:7,color:'#ffffff33',letterSpacing:'0.12em',marginBottom:2}}>{x.l}</div><div style={{fontSize:12,color:'#fff',fontWeight:500}}>{x.v}</div></div>)}
+      {[{l:'DIST',v:remDist},{l:'TIME',v:remTime},{l:'LEFT',v:`${steps.length-stepIndex}`}].map((x,i,a)=><div key={x.l} style={{flex:1,textAlign:'center',borderRight:i<a.length-1?'1px solid #ffffff0a':'none',padding:'0 6px'}}><div style={{fontSize:7,color:'#ffffff33',letterSpacing:'0.12em',marginBottom:2}}>{x.l}</div><div style={{fontSize:12,color:'#fff',fontWeight:500}}>{x.v}</div></div>)}
     </div>
   </div>);
 }
@@ -753,9 +756,6 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
               placeholder="e.g. ST-AB12CD34"
               style={{flex:1,background:'#000000',border:'1px solid #ffffff12',borderRadius:12,padding:'12px 14px',color:'#fff',fontSize:13,fontFamily:"'DM Mono',monospace",outline:'none',letterSpacing:'0.06em'}}
             />
-            <button onClick={handlePaste} title="Paste" style={{padding:'0 14px',background:'#ffffff08',border:'1px solid #ffffff0c',borderRadius:12,color:'#ffffff55',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              📋
-            </button>
           </div>
           <button
             onClick={handleSearch}
