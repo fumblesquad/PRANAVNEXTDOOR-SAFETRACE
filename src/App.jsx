@@ -714,15 +714,48 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
   const[caseId,setCaseId]=useState('');
   const[searched,setSearched]=useState(false);
   const[copied,setCopied]=useState(false);
+  const[loading,setLoading]=useState(false);
+  const[caseData,setCaseData]=useState(null);
+  const[fetchError,setFetchError]=useState('');
+
+  const STATUS_CONFIG={
+    'under review':  {label:'Under Review',  color:'#38bdf8',dot:'#38bdf8',bg:'#38bdf808',border:'#38bdf822'},
+    'investigating': {label:'Investigating', color:'#fbbf24',dot:'#fbbf24',bg:'#fbbf2408',border:'#fbbf2422'},
+    'resolved':      {label:'Resolved',      color:'#34d399',dot:'#34d399',bg:'#34d39908',border:'#34d39922'},
+    'rejected':      {label:'Rejected',      color:'#ff2d55',dot:'#ff2d55',bg:'#ff2d5508',border:'#ff2d5522'},
+    'closed':        {label:'Closed',        color:'#ffffff55',dot:'#ffffff44',bg:'#ffffff05',border:'#ffffff12'},
+  };
+  const getStatusConfig=(status)=>{
+    const key=(status||'').toLowerCase().trim();
+    return STATUS_CONFIG[key]||{label:status||'Under Review',color:'#38bdf8',dot:'#38bdf8',bg:'#38bdf808',border:'#38bdf822'};
+  };
+  const formatDate=(iso)=>{
+    if(!iso)return'—';
+    const d=new Date(iso);
+    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  };
 
   const handlePaste=async()=>{
     try{const text=await navigator.clipboard.readText();setCaseId(text.trim());}
     catch(e){}
   };
 
-  const handleSearch=()=>{
-    if(caseId.trim().length<4)return;
-    setSearched(true);
+  const handleSearch=async()=>{
+    const id=caseId.trim();
+    if(id.length<4)return;
+    setLoading(true);setSearched(true);setCaseData(null);setFetchError('');
+    try{
+      const res=await fetch(
+        `${SUPABASE_URL}/rest/v1/reports?case_id=eq.${encodeURIComponent(id)}&select=case_id,status,created_at&limit=1`,
+        {headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'}}
+      );
+      if(!res.ok){setFetchError('Failed to connect. Check your network.');setCaseData(false);}
+      else{
+        const rows=await res.json();
+        setCaseData(rows&&rows.length>0?rows[0]:false);
+      }
+    }catch(e){setFetchError('Network error. Please try again.');setCaseData(false);}
+    setLoading(false);
   };
 
   const handleCopy=()=>{
@@ -759,40 +792,56 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
           </div>
           <button
             onClick={handleSearch}
-            disabled={!caseId.trim()}
-            style={{marginTop:12,width:'100%',padding:'13px',background:caseId.trim()?'#e81850':'#1a0c14',border:'none',borderRadius:14,color:caseId.trim()?'#fff':'#ffffff1a',fontSize:13,fontWeight:700,fontFamily:"'Poppins',sans-serif",cursor:caseId.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:caseId.trim()?'0 0 24px #e8185033':'none',transition:'all 0.2s'}}
+            disabled={!caseId.trim()||loading}
+            style={{marginTop:12,width:'100%',padding:'13px',background:caseId.trim()&&!loading?'#e81850':'#1a0c14',border:'none',borderRadius:14,color:caseId.trim()&&!loading?'#fff':'#ffffff1a',fontSize:13,fontWeight:700,fontFamily:"'Poppins',sans-serif",cursor:caseId.trim()&&!loading?'pointer':'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:caseId.trim()&&!loading?'0 0 24px #e8185033':'none',transition:'all 0.2s'}}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Search
+            {loading
+              ?<><span style={{animation:'spin 1s linear infinite',display:'inline-block'}}>◌</span>Looking up...</>
+              :<><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</>
+            }
           </button>
         </div>
 
-        {/* Result placeholder */}
-        {searched && (
+        {/* Loading */}
+        {loading&&<div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'28px 0',color:'#ffffff33',fontSize:12}}><span style={{animation:'spin 1s linear infinite',display:'inline-block',fontSize:18}}>◌</span>Fetching case status...</div>}
+
+        {/* Found result */}
+        {!loading&&searched&&caseData&&(()=>{const sc=getStatusConfig(caseData.status);return(
           <div style={{animation:'fadeUp 0.3s ease'}}>
             <div style={{background:'#0d0d14',border:'1px solid #ffffff08',borderRadius:18,padding:'20px',marginBottom:12}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
                 <div>
                   <div style={{fontSize:9,color:'#ffffff33',fontWeight:600,letterSpacing:'0.12em',marginBottom:4}}>CASE ID</div>
-                  <div style={{fontSize:18,fontWeight:800,color:'#e81850',fontFamily:"'DM Mono',monospace",letterSpacing:'0.06em'}}>{caseId}</div>
+                  <div style={{fontSize:18,fontWeight:800,color:'#e81850',fontFamily:"'DM Mono',monospace",letterSpacing:'0.06em'}}>{caseData.case_id}</div>
                 </div>
-                <button onClick={handleCopy} style={{background:copied?'#34d39915':'#ffffff08',border:`1px solid ${copied?'#34d39944':'#ffffff0c'}`,borderRadius:10,padding:'8px 12px',color:copied?'#34d399':'#ffffff55',fontSize:11,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',display:'flex',alignItems:'center',gap:5,transition:'all 0.2s'}}>
-                  {copied?'✓ Copied':'Copy'}
-                </button>
+                <button onClick={handleCopy} style={{background:copied?'#34d39915':'#ffffff08',border:`1px solid ${copied?'#34d39944':'#ffffff0c'}`,borderRadius:10,padding:'8px 12px',color:copied?'#34d399':'#ffffff55',fontSize:11,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',display:'flex',alignItems:'center',gap:5,transition:'all 0.2s'}}>{copied?'✓ Copied':'Copy'}</button>
               </div>
               <div style={{height:1,background:'#ffffff08',marginBottom:16}}/>
-              {/* Status placeholder */}
-              <div style={{display:'flex',alignItems:'center',gap:10,padding:'14px',background:'#38bdf808',border:'1px solid #38bdf822',borderRadius:14}}>
-                <div style={{width:10,height:10,borderRadius:'50%',background:'#38bdf8',boxShadow:'0 0 8px #38bdf8',flexShrink:0}}/>
-                <div>
-                  <div style={{fontSize:12,fontWeight:700,color:'#38bdf8'}}>Under Review</div>
-                  <div style={{fontSize:10,color:'#ffffff28',marginTop:1}}>Case details will appear here once updated</div>
+              <div style={{display:'flex',alignItems:'center',gap:10,padding:'14px',background:sc.bg,border:`1px solid ${sc.border}`,borderRadius:14,marginBottom:12}}>
+                <div style={{width:10,height:10,borderRadius:'50%',background:sc.dot,boxShadow:`0 0 8px ${sc.dot}`,flexShrink:0}}/>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:sc.color}}>{sc.label}</div>
+                  <div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>Live from SafeTrace database</div>
                 </div>
+                <button onClick={handleSearch} style={{background:'#ffffff06',border:'1px solid #ffffff0c',borderRadius:8,padding:'6px 10px',color:'#ffffff33',fontSize:10,cursor:'pointer',fontFamily:"'Poppins',sans-serif",fontWeight:600}}>↺ Refresh</button>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:'#ffffff04',border:'1px solid #ffffff06',borderRadius:12}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div style={{fontSize:10,color:'#ffffff33'}}>Submitted: <span style={{color:'#ffffff55',fontFamily:"'DM Mono',monospace"}}>{formatDate(caseData.created_at)}</span></div>
               </div>
             </div>
             <div style={{background:'#0d0d14',border:'1px solid #ffffff06',borderRadius:16,padding:'14px 16px'}}>
-              <div style={{fontSize:10,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>More case details — incident type, status updates, and assigned officer info — will be shown here once your case is processed.</div>
+              <div style={{fontSize:10,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>Status reflects the latest value in the SafeTrace database. Tap Refresh to update.</div>
             </div>
+          </div>
+        );})()}
+
+        {/* Not found / error */}
+        {!loading&&searched&&caseData===false&&(
+          <div style={{animation:'fadeUp 0.3s ease',background:'#0d0d14',border:'1px solid #ff2d5522',borderRadius:18,padding:'24px 20px',textAlign:'center'}}>
+            <div style={{fontSize:28,marginBottom:10}}>🔍</div>
+            <div style={{fontSize:13,fontWeight:700,color:'#ff2d55',marginBottom:6}}>{fetchError?'Connection Error':'Case Not Found'}</div>
+            <div style={{fontSize:11,color:'#ffffff28',lineHeight:1.6}}>{fetchError||"No record found. Double-check the Case ID — it's case-sensitive."}</div>
           </div>
         )}
 
