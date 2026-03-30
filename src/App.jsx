@@ -283,7 +283,7 @@ function ComplaintPage({onBack}){
   const handleNewReport=()=>{setSubmitted(false);setTrackingId('');setForm({type:'',description:'',otherDesc:'',date:'',time:'',evidence:[]});setPinnedLocation(null);setPinningLocation(false);};
 
   const incidentTypes=['Harassment','Stalking','Theft / Robbery','Assault','Eve-Teasing','Unsafe Area','Poor Lighting','Other'];
-  const canSubmit=form.type&&pinnedLocation&&(form.type!=='Other'||form.otherDesc)&&!submitting;
+  const canSubmit=form.type&&pinnedLocation&&form.date&&form.time&&(form.type!=='Other'||form.otherDesc)&&!submitting;
   const inp={width:'100%',padding:'14px 16px',background:'#0d0d14',border:'1px solid #ffffff10',borderRadius:14,color:'#fff',fontSize:14,fontFamily:"'Poppins',sans-serif",outline:'none'};
   const lbl={fontSize:10,fontWeight:700,color:'#ffffff44',letterSpacing:'0.15em',marginBottom:8,display:'block',fontFamily:"'Poppins',sans-serif"};
 
@@ -324,28 +324,58 @@ function ComplaintPage({onBack}){
       <div style={{padding:'16px 20px 14px',flexShrink:0,borderBottom:'1px solid #ffffff08'}}>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <button onClick={onBack} style={{background:'#ffffff08',border:'none',borderRadius:14,padding:'8px 14px',color:'#fff',fontSize:13,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer'}}>←</button>
-          <div><div style={{fontSize:17,fontWeight:800,color:'#fff'}}>Report Incident</div><div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>Help keep your community safe</div></div>
+          <div><div style={{fontSize:17,fontWeight:800,color:'#fff'}}>Report Incident</div><div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>Help keep your community safe</div><div style={{fontSize:10,color:'#e81850',marginTop:4,fontWeight:500}}>Fields marked <span style={{color:'#e81850'}}>*</span> are required</div></div>
         </div>
       </div>
       <div style={{flex:1,overflowY:'auto',padding:'16px 20px 100px',background:'#07070e'}}>
-        <div style={{marginBottom:18,background:'#07070e'}}><label style={lbl}>WHAT HAPPENED?</label>
+        <div style={{marginBottom:18,background:'#07070e'}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+            <label style={lbl}>WHAT HAPPENED?</label>
+            <span style={{fontSize:9,color:'#e81850',fontWeight:700,letterSpacing:'0.08em'}}>*</span>
+          </div>
           <div style={{display:'flex',flexWrap:'wrap',gap:8,background:'#07070e'}}>
             {incidentTypes.map(t=>{const active=form.type===t;return(<button key={t} onClick={()=>setForm(f=>({...f,type:t,otherDesc:t!=='Other'?'':f.otherDesc}))} style={{padding:'10px 16px',borderRadius:20,backgroundColor:active?'#e8185018':'#0d0d14',border:`1px solid ${active?'#e81850':'#ffffff0c'}`,color:active?'#e81850':'#ffffff55',fontSize:12,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',transition:'all 0.15s'}}>{t}</button>);})}
           </div>
         </div>
         {form.type==='Other'&&<div style={{marginBottom:18,animation:'fadeUp 0.25s ease'}}><label style={lbl}>DESCRIBE THE INCIDENT TYPE</label><input type="text" placeholder="e.g., Suspicious activity, Vandalism..." value={form.otherDesc} onChange={e=>setForm(f=>({...f,otherDesc:e.target.value}))} style={inp}/></div>}
-        <div style={{marginBottom:18}}><label style={lbl}>INCIDENT LOCATION</label>
+        <div style={{marginBottom:18}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+            <label style={lbl}>INCIDENT LOCATION</label>
+            <span style={{fontSize:9,color:'#e81850',fontWeight:700,letterSpacing:'0.08em'}}>*</span>
+          </div>
           <button onClick={()=>setPinningLocation(true)} style={{width:'100%',padding:'16px',background:pinnedLocation?'#0d1410':'#0d0d14',border:`1px solid ${pinnedLocation?'#34d39933':'#ffffff0c'}`,borderRadius:16,cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:6,transition:'all 0.2s'}}>
             <div style={{width:44,height:44,borderRadius:'50%',background:pinnedLocation?'#34d39912':'#e8185010',border:`1px solid ${pinnedLocation?'#34d39933':'#e8185033'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>{pinnedLocation?'📍':'🗺️'}</div>
             {pinnedLocation?<><div style={{fontSize:12,color:'#34d399',fontWeight:600}}>Location Pinned</div><div style={{fontSize:10,color:'#ffffff33',fontFamily:"'DM Mono',monospace"}}>{pinnedLocation.lat}, {pinnedLocation.lng}</div></>:<div style={{fontSize:13,color:'#ffffff44'}}>Tap to pin location on map</div>}
           </button>
         </div>
         <div style={{display:'flex',gap:10,marginBottom:18}}>
-          <div style={{flex:1}}><label style={lbl}>DATE</label><input type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))} style={{...inp,colorScheme:'dark'}}/></div>
-          <div style={{flex:1}}><label style={lbl}>TIME</label><input type="time" value={form.time} onChange={e=>setForm(f=>({...f,time:e.target.value}))} style={{...inp,colorScheme:'dark'}}/></div>
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+              <label style={lbl}>DATE</label>
+              <span style={{fontSize:9,color:'#e81850',fontWeight:700}}>*</span>
+            </div>
+            <input type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))} style={{...inp,colorScheme:'dark'}}/>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+              <label style={lbl}>TIME</label>
+              <span style={{fontSize:9,color:'#e81850',fontWeight:700}}>*</span>
+            </div>
+            <input type="time" value={form.time} onChange={e=>setForm(f=>({...f,time:e.target.value}))} style={{...inp,colorScheme:'dark'}}/>
+          </div>
         </div>
-        <div style={{marginBottom:18}}><label style={lbl}>DETAILS (OPTIONAL)</label><textarea placeholder="Anything else you want to share..." value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} rows={3} style={{...inp,resize:'none',lineHeight:1.5}}/></div>
-        <div style={{marginBottom:24}}><label style={lbl}>EVIDENCE</label>
+        <div style={{marginBottom:18}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+            <label style={lbl}>DETAILS</label>
+            <span style={{fontSize:9,color:'#ffffff28',fontWeight:600,letterSpacing:'0.08em',background:'#ffffff08',padding:'2px 6px',borderRadius:4}}>OPTIONAL</span>
+          </div>
+          <textarea placeholder="Anything else you want to share..." value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} rows={3} style={{...inp,resize:'none',lineHeight:1.5}}/>
+        </div>
+        <div style={{marginBottom:24}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+            <label style={lbl}>EVIDENCE</label>
+            <span style={{fontSize:9,color:'#ffffff28',fontWeight:600,letterSpacing:'0.08em',background:'#ffffff08',padding:'2px 6px',borderRadius:4}}>OPTIONAL</span>
+          </div>
           <input ref={fileInputRef} type="file" accept="image/*,video/*,audio/*" multiple onChange={handleFileUpload} style={{display:'none'}}/>
           <button onClick={()=>fileInputRef.current?.click()} style={{width:'100%',padding:'18px 16px',background:'#0d0d14',border:'2px dashed #ffffff12',borderRadius:16,cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'#e8185010',border:'1px solid #e8185033',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>📎</div>
