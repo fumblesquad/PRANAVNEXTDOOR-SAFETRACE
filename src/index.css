@@ -1,0 +1,119 @@
+:root {
+  --bg: #0a0c10;
+  --panel: #0f1218;
+  --border: #1e2530;
+  --accent: #00ff87;
+  --accent2: #00c9ff;
+  --danger: #ff3b5c;
+  --warn: #ffaa00;
+  --text: #e8edf5;
+  --muted: #4a5568;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+}
+
+/* Dark-filter OSM tiles */
+.leaflet-tile-pane {
+  filter: brightness(0.38) saturate(0.28) hue-rotate(180deg);
+}
+.leaflet-control-zoom { display: none; }
+.leaflet-control-attribution {
+  background: rgba(0,0,0,0.5) !important;
+  color: #444 !important;
+}
+.leaflet-control-attribution a { color: #555 !important; }
+
+/* Popup styling */
+.leaflet-popup-content-wrapper {
+  background: #0f1218 !important;
+  border: 1px solid #1e2530 !important;
+  color: #e8edf5 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+}
+.leaflet-popup-tip { background: #0f1218 !important; }
+
+/* Custom marker animations */
+@keyframes user-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(0,201,255,0.3), 0 0 20px rgba(0,201,255,0.5); }
+  50%       { box-shadow: 0 0 0 8px rgba(0,201,255,0.1), 0 0 30px rgba(0,201,255,0.2); }
+}
+.user-marker {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent2);
+  border: 3px solid #fff;
+  animation: user-pulse 2s infinite;
+}
+.safe-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: rgba(0,255,135,0.2);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.safe-marker:hover { transform: scale(1.4); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Scanline overlay on map */
+.map-scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.025) 2px,
+    rgba(0,0,0,0.025) 4px
+  );
+}
+
+/* Blink dot */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+/* SOS pulse */
+@keyframes sos-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,59,92,0.4); }
+  50%       { box-shadow: 0 0 50px rgba(255,59,92,0.9); }
+}
+
+/* Slide-up notification */
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
