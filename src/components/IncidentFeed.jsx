@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getRecentReports } from '../firebase/reports';
+import { getRecentReports } from '../services/dbService';
 
 const TYPE_COLORS = {
   harassment: '#D4537E',

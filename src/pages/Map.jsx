@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Circle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { getRecentReports } from '../firebase/reports';
+import { getRecentReports } from '../services/dbService';
 
-// Risk zones around Chennai
 const RISK_ZONES = [
   { lat: 13.0827, lng: 80.2707, risk: 'high', label: 'Central Chennai', radius: 600 },
   { lat: 13.0418, lng: 80.2341, risk: 'high', label: 'T. Nagar', radius: 450 },
@@ -35,11 +33,11 @@ function RecenterControl({ userPos }) {
       onClick={() => map.setView(userPos, 14)}
       style={{
         position: 'absolute',
-        bottom: '20px',
-        right: '20px',
+        bottom: '80px',
+        right: '16px',
         zIndex: 1000,
         background: '#111',
-        border: '1px solid #333',
+        border: '1px solid #2a2a2a',
         borderRadius: '8px',
         color: '#fff',
         padding: '8px 14px',
@@ -57,7 +55,6 @@ export default function FullMap() {
   const [filter, setFilter] = useState('all');
   const [userPos, setUserPos] = useState(null);
   const [mapCenter, setMapCenter] = useState([13.0827, 80.2707]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     getRecentReports(50).then(setReports).catch(() => {});
@@ -76,58 +73,40 @@ export default function FullMap() {
 
   return (
     <div style={{ height: '100vh', background: '#0a0a0a', display: 'flex', flexDirection: 'column' }}>
-      {/* Toolbar */}
+      {/* Toolbar — no back button, user swipes to navigate */}
       <div style={{
         padding: '10px 16px',
         background: '#0f0f0f',
         borderBottom: '1px solid #1a1a1a',
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: '10px',
         flexWrap: 'wrap',
         zIndex: 10,
         position: 'relative',
       }}>
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: 'none',
-            border: '1px solid #2a2a2a',
-            borderRadius: '6px',
-            color: '#aaa',
-            padding: '5px 12px',
-            cursor: 'pointer',
-            fontSize: '13px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            flexShrink: 0,
-          }}
-        >
-          ← Back
-        </button>
-        <div style={{ width: '1px', height: '20px', background: '#2a2a2a' }} />
-        <span style={{ color: '#555', fontSize: '13px' }}>Filter:</span>
+        <span style={{ color: '#444', fontSize: '12px', flexShrink: 0 }}>Filter:</span>
         {types.map(t => (
           <button
             key={t}
             onClick={() => setFilter(t)}
             style={{
-              padding: '5px 14px',
+              padding: '5px 12px',
               borderRadius: '16px',
               border: filter === t ? '1px solid #D4537E' : '1px solid #2a2a2a',
-              background: filter === t ? 'rgba(212,83,126,0.15)' : 'transparent',
-              color: filter === t ? '#D4537E' : '#666',
+              background: filter === t ? 'rgba(212,83,126,0.14)' : 'transparent',
+              color: filter === t ? '#D4537E' : '#555',
               fontSize: '12px',
               cursor: 'pointer',
               textTransform: 'capitalize',
+              fontFamily: 'inherit',
             }}
           >
             {t}
           </button>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <LegendItem color="#cc0000" label="High Risk" />
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '14px', alignItems: 'center' }}>
+          <LegendItem color="#cc0000" label="High" />
           <LegendItem color="#ff6b35" label="Medium" />
           <LegendItem color="#2ecc71" label="Low" />
         </div>
@@ -143,7 +122,6 @@ export default function FullMap() {
         >
           <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
 
-          {/* Risk zones */}
           {RISK_ZONES.map((zone, i) => (
             <Circle
               key={i}
@@ -158,8 +136,7 @@ export default function FullMap() {
             >
               <Popup>
                 <div style={{ background: '#111', color: '#fff', padding: '8px', borderRadius: '6px', minWidth: '140px' }}>
-                  <strong>{zone.label}</strong>
-                  <br />
+                  <strong>{zone.label}</strong><br />
                   <span style={{ color: RISK_COLORS[zone.risk], fontSize: '12px', textTransform: 'capitalize' }}>
                     {zone.risk} risk
                   </span>
@@ -168,7 +145,6 @@ export default function FullMap() {
             </Circle>
           ))}
 
-          {/* Incident pins */}
           {filteredReports.map(r =>
             r.location ? (
               <CircleMarker
@@ -184,8 +160,7 @@ export default function FullMap() {
               >
                 <Popup>
                   <div style={{ background: '#111', color: '#fff', padding: '8px', borderRadius: '6px', minWidth: '160px' }}>
-                    <strong style={{ textTransform: 'capitalize' }}>{r.type}</strong>
-                    <br />
+                    <strong style={{ textTransform: 'capitalize' }}>{r.type}</strong><br />
                     <span style={{ color: '#aaa', fontSize: '12px' }}>{r.caseId}</span>
                     {r.description && (
                       <p style={{ color: '#888', fontSize: '12px', margin: '6px 0 0' }}>
@@ -198,7 +173,6 @@ export default function FullMap() {
             ) : null
           )}
 
-          {/* User location */}
           {userPos && (
             <CircleMarker
               center={userPos}
@@ -223,8 +197,8 @@ export default function FullMap() {
 function LegendItem({ color, label }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: color }} />
-      <span style={{ color: '#666', fontSize: '12px' }}>{label}</span>
+      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: color }} />
+      <span style={{ color: '#555', fontSize: '11px' }}>{label}</span>
     </div>
   );
 }

@@ -1,34 +1,29 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
+import SOS from './pages/SOS';
+import MainApp from './pages/MainApp';
 import SignIn from './pages/SignIn';
-import Report from './pages/Report';
-import FullMap from './pages/Map';
 import Track from './pages/Track';
-import EvidenceLocker from './pages/EvidenceLocker';
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/map" element={<FullMap />} />
-          <Route
-            path="*"
-            element={
-              <>
-                <Navbar />
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/signin" element={<SignIn />} />
-                  <Route path="/report" element={<Report />} />
-                  <Route path="/track" element={<Track />} />
-                  <Route path="/evidence-locker" element={<EvidenceLocker />} />
-                </Routes>
-              </>
-            }
-          />
+          {/* SOS screen — landing */}
+          <Route path="/" element={<SOS />} />
+
+          {/* Main tabbed app */}
+          <Route path="/home" element={<MainApp />} />
+
+          {/* Standalone sign in */}
+          <Route path="/signin" element={<SignIn />} />
+
+          {/* Standalone case tracker */}
+          <Route path="/track" element={<Track />} />
+
+          {/* Fallback to SOS */}
+          <Route path="*" element={<SOS />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { submitReport } from '../firebase/reports';
+import { submitReport } from '../services/dbService';
 
 export default function SOSButton() {
   const [triggered, setTriggered] = useState(false);

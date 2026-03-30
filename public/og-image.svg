@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <circle cx="600" cy="248" r="44" fill="none" stroke="#D4537E" stroke-width="3.5"/>
+  <line x1="600" y1="168" x2="600" y2="204" stroke="#D4537E" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="600" y1="292" x2="600" y2="328" stroke="#D4537E" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="520" y1="248" x2="556" y2="248" stroke="#D4537E" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="644" y1="248" x2="680" y2="248" stroke="#D4537E" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="600" cy="248" r="8" fill="#D4537E"/>
+  <text x="600" y="412" font-family="'DM Sans', system-ui, sans-serif" font-size="80" font-weight="700" fill="#ffffff" text-anchor="middle">SafeTrace</text>
+  <text x="600" y="462" font-family="'DM Sans', system-ui, sans-serif" font-size="18" fill="#444444" text-anchor="middle" letter-spacing="8">ANONYMOUS · FAST · SECURE</text>
+</svg>
