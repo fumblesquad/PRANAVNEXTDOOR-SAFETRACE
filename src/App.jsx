@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 // ═══════════════════════════════════════════════════════════════════
 // SAFETRACE v2 — Phone-Frame Mobile Safety App
@@ -183,6 +184,7 @@ function SOSOverlay({onClose}){
 // ── Supabase config ──────────────────────────────────────────────
 const SUPABASE_URL=import.meta.env.VITE_SUPABASE_URL||'https://lqupxuowivtypjgompkm.supabase.co';
 const SUPABASE_KEY=import.meta.env.VITE_SUPABASE_ANON_KEY||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxxdXB4dW93aXZ0eXBqZ29tcGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjM0NzQsImV4cCI6MjA5MDQzOTQ3NH0.HiAelrAjidEYUAFb5pam4vcE8zKNIlqpQsDlReg9BNE';
+const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 async function supabaseInsert(table,data){
   const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
@@ -711,93 +713,167 @@ function ArrivalCheckIn({destName,onSafe,onNeedHelp}){
 // TRACK PAGE
 // ═══════════════════════════════════════════════════════════════════
 function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
-  const[caseId,setCaseId]=useState('');
-  const[searched,setSearched]=useState(false);
+  const[inputId,setInputId]=useState('');
+  const[activeId,setActiveId]=useState(null); // the ID being tracked
+  const[caseData,setCaseData]=useState(null);  // null=not fetched | false=not found | object=found
+  const[loading,setLoading]=useState(false);
+  const[fetchError,setFetchError]=useState('');
   const[copied,setCopied]=useState(false);
+  const[realtimeConnected,setRealtimeConnected]=useState(false);
+  const channelRef=useRef(null);
+
+  const STATUS_CONFIG={
+    'under review':  {label:'Under Review',  color:'#38bdf8',dot:'#38bdf8',bg:'#38bdf808',border:'#38bdf822'},
+    'investigating': {label:'Investigating', color:'#fbbf24',dot:'#fbbf24',bg:'#fbbf2408',border:'#fbbf2422'},
+    'resolved':      {label:'Resolved',      color:'#34d399',dot:'#34d399',bg:'#34d39908',border:'#34d39922'},
+    'rejected':      {label:'Rejected',      color:'#ff2d55',dot:'#ff2d55',bg:'#ff2d5508',border:'#ff2d5522'},
+    'closed':        {label:'Closed',        color:'#ffffff55',dot:'#ffffff44',bg:'#ffffff05',border:'#ffffff12'},
+  };
+  const getStatus=s=>{const k=(s||'').toLowerCase().trim();return STATUS_CONFIG[k]||{label:s||'Under Review',color:'#38bdf8',dot:'#38bdf8',bg:'#38bdf808',border:'#38bdf822'};};
+  const fmtDate=iso=>{if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};
+
+  const fetchReport=async(id)=>{
+    setLoading(true);setFetchError('');
+    try{
+      const{data,error}=await supabase.from('reports').select('case_id,status,created_at').eq('case_id',id).limit(1).single();
+      if(error||!data){setCaseData(false);}
+      else{setCaseData(data);}
+    }catch(e){setFetchError('Network error.');setCaseData(false);}
+    setLoading(false);
+  };
+
+  // Subscribe to realtime whenever activeId changes
+  useEffect(()=>{
+    if(!activeId)return;
+    fetchReport(activeId);
+
+    // Tear down previous channel
+    if(channelRef.current){supabase.removeChannel(channelRef.current);channelRef.current=null;}
+
+    const ch=supabase
+      .channel(`report-status-${activeId}`)
+      .on('postgres_changes',
+        {event:'UPDATE',schema:'public',table:'reports',filter:`case_id=eq.${activeId}`},
+        payload=>{
+          console.log('[Realtime] report updated',payload.new);
+          setCaseData(prev=>prev?{...prev,...payload.new}:payload.new);
+        }
+      )
+      .subscribe(status=>{
+        setRealtimeConnected(status==='SUBSCRIBED');
+      });
+
+    channelRef.current=ch;
+    return()=>{supabase.removeChannel(ch);channelRef.current=null;setRealtimeConnected(false);};
+  },[activeId]);
+
+  const handleSearch=()=>{
+    const id=inputId.trim();
+    if(id.length<4)return;
+    setActiveId(id);
+  };
 
   const handlePaste=async()=>{
-    try{const text=await navigator.clipboard.readText();setCaseId(text.trim());}
+    try{const t=await navigator.clipboard.readText();setInputId(t.trim());}
     catch(e){}
   };
 
-  const handleSearch=()=>{
-    if(caseId.trim().length<4)return;
-    setSearched(true);
+  const handleCopy=()=>{
+    navigator.clipboard?.writeText(activeId).catch(()=>{});
+    setCopied(true);setTimeout(()=>setCopied(false),2000);
   };
 
-  const handleCopy=()=>{
-    navigator.clipboard?.writeText(caseId).catch(()=>{});
-    setCopied(true);
-    setTimeout(()=>setCopied(false),2000);
-  };
+  const sc=caseData?getStatus(caseData.status):null;
 
   return(
     <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#000000',fontFamily:"'Poppins',sans-serif",position:'relative'}}>
-      {/* Header */}
       <div style={{padding:'16px 20px 14px',flexShrink:0,borderBottom:'1px solid #ffffff08'}}>
         <div style={{fontSize:17,fontWeight:800,color:'#fff'}}>Track Case</div>
-        <div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>Enter your Case ID to view status</div>
+        <div style={{display:'flex',alignItems:'center',gap:6,marginTop:2}}>
+          <div style={{fontSize:10,color:'#ffffff28'}}>Enter your Case ID to view live status</div>
+          {activeId&&(
+            <div style={{display:'flex',alignItems:'center',gap:4,background:realtimeConnected?'#34d39910':'#ffffff08',borderRadius:20,padding:'2px 8px',border:`1px solid ${realtimeConnected?'#34d39933':'#ffffff0c'}`}}>
+              <div style={{width:5,height:5,borderRadius:'50%',background:realtimeConnected?'#34d399':'#ffffff33',boxShadow:realtimeConnected?'0 0 4px #34d399':'none'}}/>
+              <span style={{fontSize:8,color:realtimeConnected?'#34d399':'#ffffff33',fontWeight:600}}>{realtimeConnected?'LIVE':'CONNECTING'}</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Body */}
       <div style={{flex:1,overflowY:'auto',padding:'24px 20px 100px',background:'#000000'}}>
-
-        {/* Search box */}
+        {/* Search */}
         <div style={{background:'#0d0d14',border:'1px solid #ffffff10',borderRadius:18,padding:'16px',marginBottom:16}}>
           <div style={{fontSize:10,fontWeight:700,color:'#ffffff44',letterSpacing:'0.15em',marginBottom:10}}>CASE ID</div>
           <div style={{display:'flex',gap:8}}>
             <input
               type="text"
-              value={caseId}
-              onChange={e=>setCaseId(e.target.value.toUpperCase())}
+              value={inputId}
+              onChange={e=>setInputId(e.target.value.toUpperCase())}
+              onKeyDown={e=>e.key==='Enter'&&handleSearch()}
               placeholder="e.g. ST-AB12CD34"
               style={{flex:1,background:'#000000',border:'1px solid #ffffff12',borderRadius:12,padding:'12px 14px',color:'#fff',fontSize:13,fontFamily:"'DM Mono',monospace",outline:'none',letterSpacing:'0.06em'}}
             />
-            <button onClick={handlePaste} title="Paste" style={{padding:'0 14px',background:'#ffffff08',border:'1px solid #ffffff0c',borderRadius:12,color:'#ffffff55',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              📋
-            </button>
+            <button onClick={handlePaste} title="Paste" style={{padding:'0 14px',background:'#ffffff08',border:'1px solid #ffffff0c',borderRadius:12,color:'#ffffff55',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>📋</button>
           </div>
           <button
             onClick={handleSearch}
-            disabled={!caseId.trim()}
-            style={{marginTop:12,width:'100%',padding:'13px',background:caseId.trim()?'#e81850':'#1a0c14',border:'none',borderRadius:14,color:caseId.trim()?'#fff':'#ffffff1a',fontSize:13,fontWeight:700,fontFamily:"'Poppins',sans-serif",cursor:caseId.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:caseId.trim()?'0 0 24px #e8185033':'none',transition:'all 0.2s'}}
+            disabled={!inputId.trim()||loading}
+            style={{marginTop:12,width:'100%',padding:'13px',background:inputId.trim()&&!loading?'#e81850':'#1a0c14',border:'none',borderRadius:14,color:inputId.trim()&&!loading?'#fff':'#ffffff1a',fontSize:13,fontWeight:700,fontFamily:"'Poppins',sans-serif",cursor:inputId.trim()&&!loading?'pointer':'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:inputId.trim()&&!loading?'0 0 24px #e8185033':'none',transition:'all 0.2s'}}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Search
+            {loading
+              ?<><span style={{animation:'spin 1s linear infinite',display:'inline-block'}}>◌</span>Looking up...</>
+              :<><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Track Case</>
+            }
           </button>
         </div>
 
-        {/* Result placeholder */}
-        {searched && (
+        {/* Loading */}
+        {loading&&<div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'28px 0',color:'#ffffff33',fontSize:12}}><span style={{animation:'spin 1s linear infinite',display:'inline-block',fontSize:18}}>◌</span>Fetching case status...</div>}
+
+        {/* Found */}
+        {!loading&&caseData&&sc&&(
           <div style={{animation:'fadeUp 0.3s ease'}}>
             <div style={{background:'#0d0d14',border:'1px solid #ffffff08',borderRadius:18,padding:'20px',marginBottom:12}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
                 <div>
                   <div style={{fontSize:9,color:'#ffffff33',fontWeight:600,letterSpacing:'0.12em',marginBottom:4}}>CASE ID</div>
-                  <div style={{fontSize:18,fontWeight:800,color:'#e81850',fontFamily:"'DM Mono',monospace",letterSpacing:'0.06em'}}>{caseId}</div>
+                  <div style={{fontSize:18,fontWeight:800,color:'#e81850',fontFamily:"'DM Mono',monospace",letterSpacing:'0.06em'}}>{caseData.case_id}</div>
                 </div>
-                <button onClick={handleCopy} style={{background:copied?'#34d39915':'#ffffff08',border:`1px solid ${copied?'#34d39944':'#ffffff0c'}`,borderRadius:10,padding:'8px 12px',color:copied?'#34d399':'#ffffff55',fontSize:11,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',display:'flex',alignItems:'center',gap:5,transition:'all 0.2s'}}>
-                  {copied?'✓ Copied':'Copy'}
-                </button>
+                <button onClick={handleCopy} style={{background:copied?'#34d39915':'#ffffff08',border:`1px solid ${copied?'#34d39944':'#ffffff0c'}`,borderRadius:10,padding:'8px 12px',color:copied?'#34d399':'#ffffff55',fontSize:11,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',display:'flex',alignItems:'center',gap:5,transition:'all 0.2s'}}>{copied?'✓ Copied':'Copy'}</button>
               </div>
               <div style={{height:1,background:'#ffffff08',marginBottom:16}}/>
-              {/* Status placeholder */}
-              <div style={{display:'flex',alignItems:'center',gap:10,padding:'14px',background:'#38bdf808',border:'1px solid #38bdf822',borderRadius:14}}>
-                <div style={{width:10,height:10,borderRadius:'50%',background:'#38bdf8',boxShadow:'0 0 8px #38bdf8',flexShrink:0}}/>
-                <div>
-                  <div style={{fontSize:12,fontWeight:700,color:'#38bdf8'}}>Under Review</div>
-                  <div style={{fontSize:10,color:'#ffffff28',marginTop:1}}>Case details will appear here once updated</div>
+              {/* Status badge */}
+              <div style={{display:'flex',alignItems:'center',gap:10,padding:'14px',background:sc.bg,border:`1px solid ${sc.border}`,borderRadius:14,marginBottom:12}}>
+                <div style={{width:10,height:10,borderRadius:'50%',background:sc.dot,boxShadow:`0 0 8px ${sc.dot}`,flexShrink:0}}/>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:sc.color}}>{sc.label}</div>
+                  <div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>{realtimeConnected?'Live updates enabled — refreshes automatically':'Fetched from SafeTrace database'}</div>
                 </div>
+                {realtimeConnected&&<div style={{width:6,height:6,borderRadius:'50%',background:'#34d399',boxShadow:'0 0 6px #34d399',animation:'breathe 2s ease-in-out infinite'}}/>}
+              </div>
+              {/* Date */}
+              <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:'#ffffff04',border:'1px solid #ffffff06',borderRadius:12}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div style={{fontSize:10,color:'#ffffff33'}}>Submitted: <span style={{color:'#ffffff55',fontFamily:"'DM Mono',monospace"}}>{fmtDate(caseData.created_at)}</span></div>
               </div>
             </div>
             <div style={{background:'#0d0d14',border:'1px solid #ffffff06',borderRadius:16,padding:'14px 16px'}}>
-              <div style={{fontSize:10,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>More case details — incident type, status updates, and assigned officer info — will be shown here once your case is processed.</div>
+              <div style={{fontSize:10,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>Status updates automatically when your case is reviewed — no need to refresh.</div>
             </div>
           </div>
         )}
 
+        {/* Not found */}
+        {!loading&&activeId&&caseData===false&&(
+          <div style={{animation:'fadeUp 0.3s ease',background:'#0d0d14',border:'1px solid #ff2d5522',borderRadius:18,padding:'24px 20px',textAlign:'center'}}>
+            <div style={{fontSize:28,marginBottom:10}}>🔍</div>
+            <div style={{fontSize:13,fontWeight:700,color:'#ff2d55',marginBottom:6}}>{fetchError?'Connection Error':'Case Not Found'}</div>
+            <div style={{fontSize:11,color:'#ffffff28',lineHeight:1.6}}>{fetchError||"No record found. Double-check the Case ID — it's case-sensitive."}</div>
+          </div>
+        )}
+
         {/* Empty state */}
-        {!searched && (
+        {!activeId&&(
           <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'32px 0',gap:12,opacity:0.5}}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ffffff22" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <div style={{fontSize:12,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>Enter your Case ID above{"\n"}to check your report status</div>
