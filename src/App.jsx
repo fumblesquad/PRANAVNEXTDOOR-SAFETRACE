@@ -737,13 +737,14 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
 
   const fetchReport=async(id)=>{
     setLoading(true);setFetchError('');
+    const trimmedId = id.trim().toUpperCase();
     try{
-      const{data,error}=await supabase.from('reports').select('case_id,status,created_at').eq('case_id',id);
+      const{data,error}=await supabase.from('reports').select('*').eq('case_id',trimmedId).maybeSingle();
       if(error){
         console.error('Supabase select error:', error);
         setCaseData(false);
-      } else if(data&&data.length>0){
-        setCaseData(data[0]);
+      } else if(data){
+        setCaseData(data);
       } else {
         setCaseData(false);
       }
