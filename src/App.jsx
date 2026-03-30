@@ -109,7 +109,34 @@ function haversine(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.l
 function decodePolyline(e){let i=0,lat=0,lng=0;const o=[];while(i<e.length){let b,s=0,r=0;do{b=e.charCodeAt(i++)-63;r|=(b&0x1f)<<s;s+=5;}while(b>=0x20);lat+=r&1?~(r>>1):r>>1;s=0;r=0;do{b=e.charCodeAt(i++)-63;r|=(b&0x1f)<<s;s+=5;}while(b>=0x20);lng+=r&1?~(r>>1):r>>1;o.push([lat/1e5,lng/1e5]);}return o;}
 function stripHTML(h){return h.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();}
 function buildOSRMInstruction(s){const t=s.maneuver?.type||'',m=s.maneuver?.modifier||'',n=s.name?` on ${s.name}`:'',d=s.distance>0?` for ${Math.round(s.distance)} m`:'';const v={depart:`Head ${m}${n}`,arrive:'Arrive at your destination',turn:`Turn ${m}${n}`,'new name':`Continue${n}`,continue:`Continue straight${n}`,merge:`Merge ${m}${n}`,'on ramp':`Take ramp ${m}${n}`,'off ramp':`Take exit ${m}${n}`,fork:`Keep ${m} at fork${n}`,roundabout:`At roundabout, take exit${n}`,rotary:`At rotary, take exit${n}`,'end of road':`End of road, turn ${m}${n}`,notification:`Continue${n}`};return(v[t]||`Continue${n}`)+d;}
-async function fetchRoute(start,end){try{const data=await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}&mode=walking&key=${GOOGLE_API_KEY}`).then(r=>r.json());if(data.status==='OK'){const leg=data.routes[0].legs[0];const steps=leg.steps.map(s=>({instruction:stripHTML(s.html_instructions),distance:s.distance.text,distanceM:s.distance.value,maneuver:s.maneuver||'',coords:decodePolyline(s.polyline.points)}));return{allCoords:steps.flatMap(s=>s.coords),steps,totalDist:leg.distance.text,totalTime:leg.duration.text};}}catch(_){}try{const data=await fetch(`https://router.project-osrm.org/route/v1/foot/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&steps=true&annotations=false`).then(r=>r.json());if(data.code==='Ok'){const route=data.routes[0],leg=route.legs[0];const steps=leg.steps.filter(s=>s.maneuver?.type!=='depart'||leg.steps.indexOf(s)===0).map(s=>{const raw=s.geometry?.coordinates||[];return{instruction:buildOSRMInstruction(s),distance:`${Math.round(s.distance)} m`,distanceM:s.distance,maneuver:s.maneuver?.modifier||s.maneuver?.type||'',coords:raw.length?raw.map(([ln,la])=>[la,ln]):[]};});return{allCoords:route.geometry.coordinates.map(([ln,la])=>[la,ln]),steps,totalDist:`${(route.distance/1000).toFixed(2)} km`,totalTime:`${Math.ceil(route.duration/60)} min`};}}catch(_){}return null;}
+async function fetchRoute(start,end,unsafeZones=[]){
+  const getScore=pts=>{if(!unsafeZones||!unsafeZones.length)return 0;let sc=0;for(let i=0;i<pts.length;i+=2){const pt={lat:pts[i][0],lng:pts[i][1]};for(const z of unsafeZones){if(z.risk>=0.60&&haversine(pt,{lat:z.lat,lng:z.lng})<=(z.radius||150)){sc+=z.risk;}}}return sc;};
+  try{
+    const data=await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}&mode=walking&alternatives=true&key=${GOOGLE_API_KEY}`).then(r=>r.json());
+    if(data.status==='OK'&&data.routes.length>0){
+      const parsedRoutes=data.routes.map(r=>{
+        const leg=r.legs[0];const steps=leg.steps.map(s=>({instruction:stripHTML(s.html_instructions),distance:s.distance.text,distanceM:s.distance.value,maneuver:s.maneuver||'',coords:decodePolyline(s.polyline.points)}));
+        const allCoords=steps.flatMap(s=>s.coords);
+        return{allCoords,steps,totalDist:leg.distance.text,totalTime:leg.duration.text,score:getScore(allCoords),distVal:leg.distance.value};
+      });
+      parsedRoutes.sort((a,b)=>a.score===b.score?(a.distVal-b.distVal):(a.score-b.score));
+      return parsedRoutes[0];
+    }
+  }catch(_){}
+  try{
+    const data=await fetch(`https://router.project-osrm.org/route/v1/foot/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=true&overview=full&geometries=geojson&steps=true&annotations=false`).then(r=>r.json());
+    if(data.code==='Ok'&&data.routes.length>0){
+      const parsedRoutes=data.routes.map(route=>{
+        const leg=route.legs[0];const steps=leg.steps.filter(s=>s.maneuver?.type!=='depart'||leg.steps.indexOf(s)===0).map(s=>{const raw=s.geometry?.coordinates||[];return{instruction:buildOSRMInstruction(s),distance:`${Math.round(s.distance)} m`,distanceM:s.distance,maneuver:s.maneuver?.modifier||s.maneuver?.type||'',coords:raw.length?raw.map(([ln,la])=>[la,ln]):[]};});
+        const allCoords=route.geometry.coordinates.map(([ln,la])=>[la,ln]);
+        return{allCoords,steps,totalDist:`${(route.distance/1000).toFixed(2)} km`,totalTime:`${Math.ceil(route.duration/60)} min`,score:getScore(allCoords),distVal:route.distance};
+      });
+      parsedRoutes.sort((a,b)=>a.score===b.score?(a.distVal-b.distVal):(a.score-b.score));
+      return parsedRoutes[0];
+    }
+  }catch(_){}
+  return null;
+}
 function fmDist(m){return m>=1000?`${(m/1000).toFixed(1)} km`:`${Math.round(m)} m`;}
 function fmWalk(m){const mins=Math.ceil(m/80);return mins<60?`${mins} min`:`${Math.floor(mins/60)}h ${mins%60}m`;}
 const DIR_ICON={'turn-left':{icon:'↰'},'turn-right':{icon:'↱'},'turn-sharp-left':{icon:'↺'},'turn-sharp-right':{icon:'↻'},'turn-slight-left':{icon:'↖'},'turn-slight-right':{icon:'↗'},'uturn-left':{icon:'↩'},'uturn-right':{icon:'↪'},straight:{icon:'↑'},'ramp-left':{icon:'↰'},'ramp-right':{icon:'↱'},merge:{icon:'⤵'},'fork-left':{icon:'⑂'},'fork-right':{icon:'⑂'},ferry:{icon:'⛴'},'roundabout-left':{icon:'⟳'},'roundabout-right':{icon:'⟳'},left:{icon:'↰'},right:{icon:'↱'},'sharp left':{icon:'↺'},'sharp right':{icon:'↻'},'slight left':{icon:'↖'},'slight right':{icon:'↗'},'u-turn':{icon:'↩'},arrive:{icon:'🏁'},depart:{icon:'↑'}};
@@ -905,7 +932,7 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
   const fetchPlacesForPin=useCallback(async(lat,lng)=>{if(!GOOGLE_API_KEY||GOOGLE_API_KEY==='YOUR_GOOGLE_API_KEY_HERE')return STATIC_SAFE_PLACES;setPlacesLoading(true);try{const dp=await fetchNearbyPlaces(lat,lng,GOOGLE_API_KEY);if(dp.length>0){const m=[...dp];for(const s of STATIC_SAFE_PLACES)if(!dp.some(d=>haversine({lat:s.lat,lng:s.lng},{lat:d.lat,lng:d.lng})<100))m.push(s);setSafePlaces(m);setDataStatus(p=>({...p,places:'live'}));return m;}}catch(e){}finally{setPlacesLoading(false);}return STATIC_SAFE_PLACES;},[]);
 
   const handlePinDrop=useCallback(async(latlng)=>{if(navigating)return;const{lat,lng}=latlng;setPin({lat,lng});const places=await fetchPlacesForPin(lat,lng);setNearby([...places].map(p=>({...p,_dist:haversine({lat,lng},p)})).sort((a,b)=>a._dist-b._dist).slice(0,8));},[navigating,fetchPlacesForPin]);
-  async function handleSelectDest(p){setDest(p);setRouteData(null);setLoading(true);setRouteData(await fetchRoute(pin,p));setLoading(false);}
+  async function handleSelectDest(p){setDest(p);setRouteData(null);setLoading(true);setRouteData(await fetchRoute(pin,p,unsafeZones));setLoading(false);}
   function handleStartNav(){setNavigating(true);setStepIndex(0);}
   function handleArrived(){setArrivedDest(dest?.name||'destination');setNavigating(false);setShowArrival(true);}
   function handleReset(){setPin(null);setNearby([]);setDest(null);setRouteData(null);setNavigating(false);setStepIndex(0);setLoading(false);setShowArrival(false);}
