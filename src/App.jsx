@@ -292,11 +292,15 @@ function ComplaintPage({onBack}){
       <div style={{width:72,height:72,borderRadius:'50%',background:'#34d39915',border:'2px solid #34d399',display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,marginBottom:20,animation:'checkPop 0.5s cubic-bezier(0.34,1.4,0.64,1)'}}>✓</div>
       <div style={{color:'#34d399',fontSize:18,fontWeight:800,marginBottom:6}}>Report Submitted</div>
       <div style={{color:'#ffffff33',fontSize:12,marginBottom:20}}>Your complaint has been recorded</div>
-      <div style={{background:'#0d0d14',border:'1px solid #ffffff10',borderRadius:16,padding:'16px 24px',marginBottom:24,width:'100%'}}>
+      <div style={{background:'#0d0d14',border:'1px solid #ffffff10',borderRadius:16,padding:'16px 24px',marginBottom:16,width:'100%'}}>
         <div style={{fontSize:9,color:'#ffffff33',fontWeight:600,letterSpacing:'0.12em',marginBottom:6}}>CASE ID</div>
         <div style={{fontSize:22,fontWeight:800,color:'#e81850',fontFamily:"'DM Mono',monospace",letterSpacing:'0.08em'}}>{trackingId}</div>
         <div style={{fontSize:10,color:'#ffffff22',marginTop:6}}>Save this ID to track your case</div>
       </div>
+      <button onClick={()=>{navigator.clipboard?.writeText(trackingId).catch(()=>{});const el=document.createElement('textarea');el.value=trackingId;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);}} style={{width:'100%',padding:'11px',background:'#ffffff08',border:'1px solid #ffffff14',borderRadius:14,color:'#ffffff88',fontSize:12,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',marginBottom:16,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Case ID
+      </button>
       <div style={{display:'flex',gap:10,width:'100%'}}>
         <button onClick={handleNewReport} style={{flex:1,padding:'12px',background:'transparent',border:'1px solid #ffffff12',borderRadius:16,color:'#ffffff55',fontSize:12,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer'}}>New Report</button>
         <button onClick={onBack} style={{flex:1,padding:'12px',background:'#e81850',border:'none',borderRadius:16,color:'#fff',fontSize:12,fontWeight:700,fontFamily:"'Poppins',sans-serif",cursor:'pointer'}}>Back to Map</button>
@@ -502,20 +506,19 @@ function LeafletMap({pin,onMapClick,nearby,safePlaces,dest,routeData,navigating,
 }
 
 // ═══════════════════════════════════════════════════════════════════
-function BottomNav({activeTab,onMap,onSOS,onComplaint,sosAnim}){return(
-  <div style={{position:'absolute',bottom:0,left:0,right:0,zIndex:950,height:68,background:'rgba(7,7,14,0.97)',borderTop:'1px solid #ffffff06',backdropFilter:'blur(20px)',display:'flex',alignItems:'center',justifyContent:'space-around',padding:'0 16px',fontFamily:"'Poppins',sans-serif"}}>
-    <button onClick={onMap} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',color:activeTab==='map'?'#e81850':'#ffffff28',transition:'color 0.2s'}}>
+function BottomNav({activeTab,onMap,onComplaint,onTrack}){return(
+  <div style={{position:'absolute',bottom:0,left:0,right:0,zIndex:950,height:68,background:'rgba(7,7,14,0.97)',borderTop:'1px solid #ffffff06',backdropFilter:'blur(20px)',display:'flex',alignItems:'center',justifyContent:'space-around',padding:'0 24px',fontFamily:"'Poppins',sans-serif"}}>
+    <button onClick={onMap} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',color:activeTab==='map'?'#e81850':'#ffffff28',transition:'color 0.2s',flex:1}}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
       <span style={{fontSize:9,fontWeight:600}}>Map</span>
     </button>
-    <button onClick={onSOS} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:1,background:'none',border:'none',cursor:'pointer',position:'relative'}}>
-      <div style={{width:50,height:50,borderRadius:'50%',background:'#e81850',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 24px #e8185033',marginTop:-10,animation:sosAnim?'sosNavBounce 0.6s ease':'none',transition:'transform 0.15s'}}>
-        <span style={{color:'#fff',fontSize:14,fontWeight:800,fontFamily:"'Poppins',sans-serif"}}>SOS</span>
-      </div>
-    </button>
-    <button onClick={onComplaint} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',color:activeTab==='complaint'?'#e81850':'#ffffff28',transition:'color 0.2s'}}>
+    <button onClick={onComplaint} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',color:activeTab==='complaint'?'#e81850':'#ffffff28',transition:'color 0.2s',flex:1}}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
       <span style={{fontSize:9,fontWeight:600}}>Report</span>
+    </button>
+    <button onClick={onTrack} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',color:activeTab==='track'?'#e81850':'#ffffff28',transition:'color 0.2s',flex:1}}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span style={{fontSize:9,fontWeight:600}}>Track</span>
     </button>
   </div>
 );}
@@ -699,7 +702,110 @@ function ArrivalCheckIn({destName,onSafe,onNeedHelp}){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-function MapPage({onSOS,onComplaint,onMap,activeTab,showSOS,sosAnim}){
+// TRACK PAGE
+// ═══════════════════════════════════════════════════════════════════
+function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
+  const[caseId,setCaseId]=useState('');
+  const[searched,setSearched]=useState(false);
+  const[copied,setCopied]=useState(false);
+
+  const handlePaste=async()=>{
+    try{const text=await navigator.clipboard.readText();setCaseId(text.trim());}
+    catch(e){}
+  };
+
+  const handleSearch=()=>{
+    if(caseId.trim().length<4)return;
+    setSearched(true);
+  };
+
+  const handleCopy=()=>{
+    navigator.clipboard?.writeText(caseId).catch(()=>{});
+    setCopied(true);
+    setTimeout(()=>setCopied(false),2000);
+  };
+
+  return(
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#07070e',fontFamily:"'Poppins',sans-serif",position:'relative'}}>
+      {/* Header */}
+      <div style={{padding:'16px 20px 14px',flexShrink:0,borderBottom:'1px solid #ffffff08'}}>
+        <div style={{fontSize:17,fontWeight:800,color:'#fff'}}>Track Case</div>
+        <div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>Enter your Case ID to view status</div>
+      </div>
+
+      {/* Body */}
+      <div style={{flex:1,overflowY:'auto',padding:'24px 20px 100px',background:'#07070e'}}>
+
+        {/* Search box */}
+        <div style={{background:'#0d0d14',border:'1px solid #ffffff10',borderRadius:18,padding:'16px',marginBottom:16}}>
+          <div style={{fontSize:10,fontWeight:700,color:'#ffffff44',letterSpacing:'0.15em',marginBottom:10}}>CASE ID</div>
+          <div style={{display:'flex',gap:8}}>
+            <input
+              type="text"
+              value={caseId}
+              onChange={e=>setCaseId(e.target.value.toUpperCase())}
+              placeholder="e.g. ST-AB12CD34"
+              style={{flex:1,background:'#07070e',border:'1px solid #ffffff12',borderRadius:12,padding:'12px 14px',color:'#fff',fontSize:13,fontFamily:"'DM Mono',monospace",outline:'none',letterSpacing:'0.06em'}}
+            />
+            <button onClick={handlePaste} title="Paste" style={{padding:'0 14px',background:'#ffffff08',border:'1px solid #ffffff0c',borderRadius:12,color:'#ffffff55',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              📋
+            </button>
+          </div>
+          <button
+            onClick={handleSearch}
+            disabled={!caseId.trim()}
+            style={{marginTop:12,width:'100%',padding:'13px',background:caseId.trim()?'#e81850':'#1a0c14',border:'none',borderRadius:14,color:caseId.trim()?'#fff':'#ffffff1a',fontSize:13,fontWeight:700,fontFamily:"'Poppins',sans-serif",cursor:caseId.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:caseId.trim()?'0 0 24px #e8185033':'none',transition:'all 0.2s'}}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Search
+          </button>
+        </div>
+
+        {/* Result placeholder */}
+        {searched && (
+          <div style={{animation:'fadeUp 0.3s ease'}}>
+            <div style={{background:'#0d0d14',border:'1px solid #ffffff08',borderRadius:18,padding:'20px',marginBottom:12}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+                <div>
+                  <div style={{fontSize:9,color:'#ffffff33',fontWeight:600,letterSpacing:'0.12em',marginBottom:4}}>CASE ID</div>
+                  <div style={{fontSize:18,fontWeight:800,color:'#e81850',fontFamily:"'DM Mono',monospace",letterSpacing:'0.06em'}}>{caseId}</div>
+                </div>
+                <button onClick={handleCopy} style={{background:copied?'#34d39915':'#ffffff08',border:`1px solid ${copied?'#34d39944':'#ffffff0c'}`,borderRadius:10,padding:'8px 12px',color:copied?'#34d399':'#ffffff55',fontSize:11,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',display:'flex',alignItems:'center',gap:5,transition:'all 0.2s'}}>
+                  {copied?'✓ Copied':'Copy'}
+                </button>
+              </div>
+              <div style={{height:1,background:'#ffffff08',marginBottom:16}}/>
+              {/* Status placeholder */}
+              <div style={{display:'flex',alignItems:'center',gap:10,padding:'14px',background:'#38bdf808',border:'1px solid #38bdf822',borderRadius:14}}>
+                <div style={{width:10,height:10,borderRadius:'50%',background:'#38bdf8',boxShadow:'0 0 8px #38bdf8',flexShrink:0}}/>
+                <div>
+                  <div style={{fontSize:12,fontWeight:700,color:'#38bdf8'}}>Under Review</div>
+                  <div style={{fontSize:10,color:'#ffffff28',marginTop:1}}>Case details will appear here once updated</div>
+                </div>
+              </div>
+            </div>
+            <div style={{background:'#0d0d14',border:'1px solid #ffffff06',borderRadius:16,padding:'14px 16px'}}>
+              <div style={{fontSize:10,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>More case details — incident type, status updates, and assigned officer info — will be shown here once your case is processed.</div>
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!searched && (
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'32px 0',gap:12,opacity:0.5}}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ffffff22" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div style={{fontSize:12,color:'#ffffff22',textAlign:'center',lineHeight:1.6}}>Enter your Case ID above{"\n"}to check your report status</div>
+          </div>
+        )}
+      </div>
+
+      <BottomNav activeTab={activeTab} onMap={onMap} onComplaint={onComplaint} onTrack={onTrack}/>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
   const[pin,setPin]=useState(null);const[nearby,setNearby]=useState([]);const[dest,setDest]=useState(null);const[routeData,setRouteData]=useState(null);const[loading,setLoading]=useState(false);const[navigating,setNavigating]=useState(false);const[stepIndex,setStepIndex]=useState(0);const[showUnsafe,setShowUnsafe]=useState(true);const[safePlaces,setSafePlaces]=useState(STATIC_SAFE_PLACES);const[unsafeZones,setUnsafeZones]=useState(STATIC_UNSAFE_ZONES);const[newsLoading,setNewsLoading]=useState(false);const[placesLoading,setPlacesLoading]=useState(false);const[dataStatus,setDataStatus]=useState({places:'static',news:'static'});const[mapReady,setMapReady]=useState(false);const newsFetched=useRef(false);
   const[showArrival,setShowArrival]=useState(false);const[arrivedDest,setArrivedDest]=useState('');
 
@@ -731,6 +837,10 @@ function MapPage({onSOS,onComplaint,onMap,activeTab,showSOS,sosAnim}){
             <div style={{width:5,height:5,borderRadius:'50%',background:'#34d399',boxShadow:'0 0 6px #34d399'}}/>
             <span style={{fontSize:9,color:'#34d399',fontFamily:"'Poppins',sans-serif",fontWeight:600}}>LIVE</span>
           </div>}
+          {/* SOS button — top right */}
+          <button onClick={onSOS} style={{width:44,height:44,borderRadius:'50%',background:'#e81850',border:'none',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 20px #e8185044',animation:sosAnim?'sosNavBounce 0.6s ease':'none',cursor:'pointer'}}>
+            <span style={{color:'#fff',fontSize:12,fontWeight:900,fontFamily:"'Poppins',sans-serif",letterSpacing:'0.02em'}}>SOS</span>
+          </button>
         </div>
       </div>}
 
@@ -810,7 +920,7 @@ function MapPage({onSOS,onComplaint,onMap,activeTab,showSOS,sosAnim}){
       {showArrival&&<ArrivalCheckIn destName={arrivedDest} onSafe={handleReset} onNeedHelp={handleReset}/>}
 
       {/* Bottom nav */}
-      <BottomNav activeTab={activeTab} onMap={onMap} onSOS={onSOS} onComplaint={onComplaint} sosAnim={sosAnim}/>
+      <BottomNav activeTab={activeTab} onMap={onMap} onComplaint={onComplaint} onTrack={onTrack}/>
       {showSOS&&<SOSOverlay onClose={onSOS}/>}
     </div>
   );
@@ -822,7 +932,8 @@ export default function App(){
   const triggerSOS=()=>{setSosAnim(true);setTimeout(()=>setSosAnim(false),700);setShowSOS(v=>!v);};
   return(<PhoneFrame><Styles/>
     {page==='landing'&&<LandingPage onEnter={()=>setPage('home')}/>}
-    {page==='home'&&<MapPage activeTab="map" onSOS={triggerSOS} onComplaint={()=>setPage('complaint')} onMap={()=>{}} showSOS={showSOS} sosAnim={sosAnim}/>}
-    {page==='complaint'&&<div style={{height:'100%',position:'relative'}}><ComplaintPage onBack={()=>setPage('home')}/><BottomNav activeTab="complaint" onMap={()=>setPage('home')} onSOS={triggerSOS} onComplaint={()=>{}} sosAnim={sosAnim}/>{showSOS&&<SOSOverlay onClose={triggerSOS}/>}</div>}
+    {page==='home'&&<MapPage activeTab="map" onSOS={triggerSOS} onComplaint={()=>setPage('complaint')} onMap={()=>{}} onTrack={()=>setPage('track')} showSOS={showSOS} sosAnim={sosAnim}/>}
+    {page==='complaint'&&<div style={{height:'100%',position:'relative'}}><ComplaintPage onBack={()=>setPage('home')}/><BottomNav activeTab="complaint" onMap={()=>setPage('home')} onComplaint={()=>{}} onTrack={()=>setPage('track')}/>{showSOS&&<SOSOverlay onClose={triggerSOS}/>}</div>}
+    {page==='track'&&<TrackPage activeTab="track" onMap={()=>setPage('home')} onComplaint={()=>setPage('complaint')} onTrack={()=>{}}/>}
   </PhoneFrame>);
 }
