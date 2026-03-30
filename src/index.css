@@ -3,7 +3,7 @@
 }
 
 :root {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color-scheme: dark;
@@ -13,6 +13,7 @@
 
 html {
   background: #000;
+  color-scheme: dark;
 }
 
 body {
@@ -43,12 +44,11 @@ p {
   margin: 0;
 }
 
-button {
+button, input, textarea, select {
   font-family: inherit;
-}
-
-input, textarea, select {
-  font-family: inherit;
+  color-scheme: dark;
+  background-color: transparent;
+  color: inherit;
 }
 
 /* Active/pressed state for all interactive elements */
