@@ -834,7 +834,7 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
   return(
     <div style={{height:'100%',width:'100%',position:'relative',background:'#000000'}}>
       {/* Header */}
-      {!navigating&&<div style={{position:'absolute',top:0,left:0,right:0,zIndex:800,padding:'14px 20px 10px',background:'linear-gradient(180deg,rgba(7,7,14,0.96) 0%,rgba(7,7,14,0.7) 60%,transparent 100%)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+      {!navigating&&<div style={{position:'absolute',top:0,left:0,right:0,zIndex:800,padding:'14px 20px 10px',paddingRight:'72px',background:'linear-gradient(180deg,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.7) 60%,transparent 100%)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{fontFamily:"'Poppins',sans-serif"}}>
           <span style={{fontSize:18,fontWeight:800,color:'#fff',letterSpacing:'-0.01em'}}>Safe</span><span style={{fontSize:18,fontWeight:800,color:'#e81850',letterSpacing:'-0.01em'}}>Trace</span>
         </div>
@@ -857,7 +857,7 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
 
       {/* ── Quick-stat cards (AFTER pin drop, before selecting dest) ── */}
       {pin&&!dest&&!navigating&&mapReady&&(
-        <div style={{position:'absolute',top:52,left:0,right:0,zIndex:799,padding:'0 12px',pointerEvents:'none',animation:'fadeUp 0.4s ease both'}}>
+        <div style={{position:'absolute',top:72,left:0,right:0,zIndex:799,padding:'0 12px',paddingRight:'72px',pointerEvents:'none',animation:'fadeUp 0.4s ease both'}}>
           <div style={{display:'flex',gap:8}}>
             {[
               {icon:'🛡️',value:`${safeCount}`,sub:'Safe spots in 15km',color:'#34d399'},
