@@ -119,7 +119,7 @@ const Styles=()=><style>{`
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Poppins:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{color-scheme:dark;}
-button,input,textarea,select{color-scheme:dark;background-color:transparent;color:inherit;font:inherit;}
+button,input,textarea,select{color-scheme:dark;color:inherit;font:inherit;}
 html,body,#root{height:100%;width:100%;overflow:hidden;background:#0a0a0a;}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#e8185033;border-radius:2px;}
 @keyframes breathe{0%,100%{opacity:.6;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.02);}}
@@ -328,9 +328,9 @@ function ComplaintPage({onBack}){
         </div>
       </div>
       <div style={{flex:1,overflowY:'auto',padding:'16px 20px 100px',background:'#07070e'}}>
-        <div style={{marginBottom:18}}><label style={lbl}>WHAT HAPPENED?</label>
-          <div style={{display:'flex',flexWrap:'wrap',gap:8,background:'transparent'}}>
-            {incidentTypes.map(t=>{const active=form.type===t;return(<button key={t} onClick={()=>setForm(f=>({...f,type:t,otherDesc:t!=='Other'?'':f.otherDesc}))} style={{padding:'10px 16px',borderRadius:20,background:active?'#e8185018':'#0d0d14',border:`1px solid ${active?'#e81850':'#ffffff0c'}`,color:active?'#e81850':'#ffffff55',fontSize:12,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',transition:'all 0.15s'}}>{t}</button>);})}
+        <div style={{marginBottom:18,background:'#07070e'}}><label style={lbl}>WHAT HAPPENED?</label>
+          <div style={{display:'flex',flexWrap:'wrap',gap:8,background:'#07070e'}}>
+            {incidentTypes.map(t=>{const active=form.type===t;return(<button key={t} onClick={()=>setForm(f=>({...f,type:t,otherDesc:t!=='Other'?'':f.otherDesc}))} style={{padding:'10px 16px',borderRadius:20,backgroundColor:active?'#e8185018':'#0d0d14',border:`1px solid ${active?'#e81850':'#ffffff0c'}`,color:active?'#e81850':'#ffffff55',fontSize:12,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',transition:'all 0.15s'}}>{t}</button>);})}
           </div>
         </div>
         {form.type==='Other'&&<div style={{marginBottom:18,animation:'fadeUp 0.25s ease'}}><label style={lbl}>DESCRIBE THE INCIDENT TYPE</label><input type="text" placeholder="e.g., Suspicious activity, Vandalism..." value={form.otherDesc} onChange={e=>setForm(f=>({...f,otherDesc:e.target.value}))} style={inp}/></div>}
