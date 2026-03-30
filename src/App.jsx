@@ -532,21 +532,7 @@ function LandingPage({onEnter}){
     if(phase==='first'){setPhase('confirm');return;}
     if(phase==='confirm'){
       setPhase('sending');
-      // Dial police + share location via SMS
-      const dial=()=>{window.location.href='tel:100';};
-      if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(
-          pos=>{
-            const{latitude:lat,longitude:lng}=pos.coords;
-            const mapsLink=`https://maps.google.com/?q=${lat},${lng}`;
-            const smsBody=encodeURIComponent(`EMERGENCY! I need police help. My location: ${mapsLink}`);
-            try{window.open(`sms:100?body=${smsBody}`,'_self');}catch(e){}
-            setTimeout(()=>dial(),800);
-          },
-          ()=>dial(),
-          {timeout:3000,enableHighAccuracy:true}
-        );
-      }else{dial();}
+      window.location.href='tel:100';
       setTimeout(()=>{setPhase('sent');setTimeout(()=>{setPhase('first');},2500);},1800);
     }
   };
@@ -841,9 +827,9 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
   function handleReset(){setPin(null);setNearby([]);setDest(null);setRouteData(null);setNavigating(false);setStepIndex(0);setLoading(false);setShowArrival(false);}
   function handleChangeDest(){setDest(null);setRouteData(null);setNavigating(false);setStepIndex(0);}
 
-  const safeCount=pin?safePlaces.filter(p=>(p.tags[0]==='police'||p.tags[0]==='hospital')&&haversine(pin,p)<=30000).length:safePlaces.filter(p=>p.tags[0]==='police'||p.tags[0]==='hospital').length;
-  const riskHigh=pin?unsafeZones.filter(z=>z.risk>=0.75&&haversine(pin,{lat:z.lat,lng:z.lng})<=30000).length:unsafeZones.filter(z=>z.risk>=0.75).length;
-  const riskTotal=pin?unsafeZones.filter(z=>haversine(pin,{lat:z.lat,lng:z.lng})<=30000).length:unsafeZones.length;
+  const safeCount=pin?safePlaces.filter(p=>(p.tags[0]==='police'||p.tags[0]==='hospital')&&haversine(pin,p)<=15000).length:safePlaces.filter(p=>p.tags[0]==='police'||p.tags[0]==='hospital').length;
+  const riskHigh=pin?unsafeZones.filter(z=>z.risk>=0.75&&haversine(pin,{lat:z.lat,lng:z.lng})<=15000).length:unsafeZones.filter(z=>z.risk>=0.75).length;
+  const riskTotal=pin?unsafeZones.filter(z=>haversine(pin,{lat:z.lat,lng:z.lng})<=15000).length:unsafeZones.length;
 
   return(
     <div style={{height:'100%',width:'100%',position:'relative',background:'#07070e'}}>
@@ -874,8 +860,8 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
         <div style={{position:'absolute',top:52,left:0,right:0,zIndex:799,padding:'0 12px',pointerEvents:'none',animation:'fadeUp 0.4s ease both'}}>
           <div style={{display:'flex',gap:8}}>
             {[
-              {icon:'🛡️',value:`${safeCount}`,sub:'Safe spots in 30km',color:'#34d399'},
-              {icon:'⚠️',value:`${riskTotal}`,sub:`${riskHigh} high risk in 30km`,color:'#ff2d55'},
+              {icon:'🛡️',value:`${safeCount}`,sub:'Safe spots in 15km',color:'#34d399'},
+              {icon:'⚠️',value:`${riskTotal}`,sub:`${riskHigh} high risk in 15km`,color:'#ff2d55'},
               {icon:'📡',value:'Live',sub:'Monitoring active',color:'#38bdf8'},
             ].map((card,i)=>(
               <div key={i} style={{
@@ -925,22 +911,7 @@ export default function App(){
   const[page,setPage]=useState('landing');const[showSOS,setShowSOS]=useState(false);const[sosAnim,setSosAnim]=useState(false);
   const triggerSOS=()=>{
     setSosAnim(true);setTimeout(()=>setSosAnim(false),700);
-    // Get current location, then dial police + share via SMS
-    const dial=()=>{ window.location.href='tel:100'; };
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        pos=>{
-          const{latitude:lat,longitude:lng}=pos.coords;
-          const mapsLink=`https://maps.google.com/?q=${lat},${lng}`;
-          const smsBody=encodeURIComponent(`EMERGENCY! I need police help. My location: ${mapsLink}`);
-          // Open SMS to police PCR number first, then dial 100
-          try{window.open(`sms:100?body=${smsBody}`,'_self');}catch(e){}
-          setTimeout(()=>dial(),800);
-        },
-        ()=>dial(), // If location denied, just dial
-        {timeout:3000,enableHighAccuracy:true}
-      );
-    }else{dial();}
+    window.location.href='tel:100';
     setShowSOS(v=>!v);
   };
   return(<PhoneFrame><Styles/>
