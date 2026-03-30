@@ -843,13 +843,13 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
             <div style={{width:5,height:5,borderRadius:'50%',background:'#34d399',boxShadow:'0 0 6px #34d399'}}/>
             <span style={{fontSize:9,color:'#34d399',fontFamily:"'Poppins',sans-serif",fontWeight:600}}>LIVE</span>
           </div>}
-          {/* SOS button — top right */}
-          <button onClick={onSOS} style={{width:44,height:44,borderRadius:'50%',background:'#e81850',border:'none',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 20px #e8185044',animation:sosAnim?'sosNavBounce 0.6s ease':'none',cursor:'pointer'}}>
-            <span style={{color:'#fff',fontSize:12,fontWeight:900,fontFamily:"'Poppins',sans-serif",letterSpacing:'0.02em'}}>SOS</span>
-          </button>
         </div>
       </div>}
 
+      {/* SOS button — always visible top-right, above NavOverlay */}
+      <button onClick={onSOS} style={{position:'absolute',top:14,right:20,zIndex:1200,width:44,height:44,borderRadius:'50%',background:'#e81850',border:'none',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 20px #e8185055',animation:sosAnim?'sosNavBounce 0.6s ease':'none',cursor:'pointer'}}>
+        <span style={{color:'#fff',fontSize:12,fontWeight:900,fontFamily:"'Poppins',sans-serif",letterSpacing:'0.02em'}}>SOS</span>
+      </button>
       {/* Map */}
       {mapReady&&<LeafletMap pin={pin} onMapClick={handlePinDrop} nearby={nearby} safePlaces={safePlaces} dest={dest} routeData={routeData} navigating={navigating} stepIndex={stepIndex} showUnsafe={showUnsafe} unsafeZones={unsafeZones}/>}
       {!mapReady&&<div style={{height:'100%',display:'flex',alignItems:'center',justifyContent:'center',color:'#ffffff28',fontFamily:"'Poppins',sans-serif",fontSize:13}}><span style={{animation:'spin 1s linear infinite',display:'inline-block',marginRight:10}}>◌</span>Loading map...</div>}
