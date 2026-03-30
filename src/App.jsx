@@ -146,8 +146,8 @@ html,body,#root{height:100%;width:100%;overflow:hidden;background:#0a0a0a;}
 // ═══════════════════════════════════════════════════════════════════
 function PhoneFrame({children}){return(
 <div style={{height:'100vh',width:'100vw',display:'flex',alignItems:'center',justifyContent:'center',background:'#0a0a0a',overflow:'hidden'}}>
-<div style={{width:393,height:'100vh',maxWidth:'100vw',background:'#07070e',overflow:'hidden',position:'relative',display:'flex',flexDirection:'column'}}>
-<div style={{flex:1,overflow:'hidden',position:'relative',background:'#07070e'}}>{children}</div>
+<div style={{width:393,height:'100vh',maxWidth:'100vw',background:'#000000',overflow:'hidden',position:'relative',display:'flex',flexDirection:'column'}}>
+<div style={{flex:1,overflow:'hidden',position:'relative',background:'#000000'}}>{children}</div>
 </div></div>);}
 
 // ═══════════════════════════════════════════════════════════════════
@@ -290,7 +290,7 @@ function ComplaintPage({onBack}){
   const lbl={fontSize:10,fontWeight:700,color:'#ffffff44',letterSpacing:'0.15em',marginBottom:8,display:'block',fontFamily:"'Poppins',sans-serif"};
 
   if(submitted)return(
-    <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#07070e',animation:'scaleIn 0.4s ease',fontFamily:"'Poppins',sans-serif",padding:'0 32px',textAlign:'center'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#000000',animation:'scaleIn 0.4s ease',fontFamily:"'Poppins',sans-serif",padding:'0 32px',textAlign:'center'}}>
       <div style={{width:72,height:72,borderRadius:'50%',background:'#34d39915',border:'2px solid #34d399',display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,marginBottom:20,animation:'checkPop 0.5s cubic-bezier(0.34,1.4,0.64,1)'}}>✓</div>
       <div style={{color:'#34d399',fontSize:18,fontWeight:800,marginBottom:6}}>Report Submitted</div>
       <div style={{color:'#ffffff33',fontSize:12,marginBottom:20}}>Your complaint has been recorded</div>
@@ -311,7 +311,7 @@ function ComplaintPage({onBack}){
   );
 
   if(pinningLocation)return(
-    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#07070e'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#000000'}}>
       <div style={{padding:'16px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,borderBottom:'1px solid #ffffff08'}}>
         <button onClick={()=>setPinningLocation(false)} style={{background:'#ffffff08',border:'none',borderRadius:14,padding:'8px 14px',color:'#fff',fontSize:13,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer'}}>← Back</button>
         <span style={{fontSize:12,fontWeight:700,color:'#e81850',fontFamily:"'Poppins',sans-serif"}}>Pin Location</span>
@@ -326,20 +326,20 @@ function ComplaintPage({onBack}){
   );
 
   return(
-    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#07070e',fontFamily:"'Poppins',sans-serif",position:'relative'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#000000',fontFamily:"'Poppins',sans-serif",position:'relative'}}>
       <div style={{padding:'16px 20px 14px',flexShrink:0,borderBottom:'1px solid #ffffff08'}}>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <button onClick={onBack} style={{background:'#ffffff08',border:'none',borderRadius:14,padding:'8px 14px',color:'#fff',fontSize:13,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer'}}>←</button>
           <div><div style={{fontSize:17,fontWeight:800,color:'#fff'}}>Report Incident</div><div style={{fontSize:10,color:'#ffffff28',marginTop:2}}>Help keep your community safe</div><div style={{fontSize:10,color:'#e81850',marginTop:4,fontWeight:500}}>Fields marked <span style={{color:'#e81850'}}>*</span> are required</div></div>
         </div>
       </div>
-      <div style={{flex:1,overflowY:'auto',padding:'16px 20px 100px',background:'#07070e'}}>
-        <div style={{marginBottom:18,background:'#07070e'}}>
+      <div style={{flex:1,overflowY:'auto',padding:'16px 20px 100px',background:'#000000'}}>
+        <div style={{marginBottom:18,background:'#000000'}}>
           <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
             <label style={lbl}>WHAT HAPPENED?</label>
             <span style={{fontSize:9,color:'#e81850',fontWeight:700,letterSpacing:'0.08em'}}>*</span>
           </div>
-          <div style={{display:'flex',flexWrap:'wrap',gap:8,background:'#07070e'}}>
+          <div style={{display:'flex',flexWrap:'wrap',gap:8,background:'#000000'}}>
             {incidentTypes.map(t=>{const active=form.type===t;return(<button key={t} onClick={()=>setForm(f=>({...f,type:t,otherDesc:t!=='Other'?'':f.otherDesc}))} style={{padding:'10px 16px',borderRadius:20,backgroundColor:active?'#e8185018':'#0d0d14',border:`1px solid ${active?'#e81850':'#ffffff0c'}`,color:active?'#e81850':'#ffffff55',fontSize:12,fontWeight:600,fontFamily:"'Poppins',sans-serif",cursor:'pointer',transition:'all 0.15s'}}>{t}</button>);})}
           </div>
         </div>
@@ -538,7 +538,7 @@ function LandingPage({onEnter}){
   };
   const isRed=phase==='confirm'||phase==='sending';const isSent=phase==='sent';
   return(
-  <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:isSent?'#040e08':isRed?'#12060a':'#07070e',fontFamily:"'Poppins',sans-serif",animation:'fadeIn 0.5s ease',position:'relative',transition:'background 0.6s'}}>
+  <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:isSent?'#040e08':isRed?'#12060a':'#000000',fontFamily:"'Poppins',sans-serif",animation:'fadeIn 0.5s ease',position:'relative',transition:'background 0.6s'}}>
     {/* Subtle dot grid */}
     <div style={{position:'absolute',inset:0,opacity:0.03,backgroundImage:'radial-gradient(#e81850 1px, transparent 1px)',backgroundSize:'32px 32px',pointerEvents:'none'}}/>
 
@@ -732,7 +732,7 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
   };
 
   return(
-    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#07070e',fontFamily:"'Poppins',sans-serif",position:'relative'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#000000',fontFamily:"'Poppins',sans-serif",position:'relative'}}>
       {/* Header */}
       <div style={{padding:'16px 20px 14px',flexShrink:0,borderBottom:'1px solid #ffffff08'}}>
         <div style={{fontSize:17,fontWeight:800,color:'#fff'}}>Track Case</div>
@@ -740,7 +740,7 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
       </div>
 
       {/* Body */}
-      <div style={{flex:1,overflowY:'auto',padding:'24px 20px 100px',background:'#07070e'}}>
+      <div style={{flex:1,overflowY:'auto',padding:'24px 20px 100px',background:'#000000'}}>
 
         {/* Search box */}
         <div style={{background:'#0d0d14',border:'1px solid #ffffff10',borderRadius:18,padding:'16px',marginBottom:16}}>
@@ -751,7 +751,7 @@ function TrackPage({onBack,activeTab,onMap,onComplaint,onTrack}){
               value={caseId}
               onChange={e=>setCaseId(e.target.value.toUpperCase())}
               placeholder="e.g. ST-AB12CD34"
-              style={{flex:1,background:'#07070e',border:'1px solid #ffffff12',borderRadius:12,padding:'12px 14px',color:'#fff',fontSize:13,fontFamily:"'DM Mono',monospace",outline:'none',letterSpacing:'0.06em'}}
+              style={{flex:1,background:'#000000',border:'1px solid #ffffff12',borderRadius:12,padding:'12px 14px',color:'#fff',fontSize:13,fontFamily:"'DM Mono',monospace",outline:'none',letterSpacing:'0.06em'}}
             />
             <button onClick={handlePaste} title="Paste" style={{padding:'0 14px',background:'#ffffff08',border:'1px solid #ffffff0c',borderRadius:12,color:'#ffffff55',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
               📋
@@ -832,7 +832,7 @@ function MapPage({onSOS,onComplaint,onMap,onTrack,activeTab,showSOS,sosAnim}){
   const riskTotal=pin?unsafeZones.filter(z=>haversine(pin,{lat:z.lat,lng:z.lng})<=15000).length:unsafeZones.length;
 
   return(
-    <div style={{height:'100%',width:'100%',position:'relative',background:'#07070e'}}>
+    <div style={{height:'100%',width:'100%',position:'relative',background:'#000000'}}>
       {/* Header */}
       {!navigating&&<div style={{position:'absolute',top:0,left:0,right:0,zIndex:800,padding:'14px 20px 10px',background:'linear-gradient(180deg,rgba(7,7,14,0.96) 0%,rgba(7,7,14,0.7) 60%,transparent 100%)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{fontFamily:"'Poppins',sans-serif"}}>
