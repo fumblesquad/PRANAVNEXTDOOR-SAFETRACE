@@ -156,14 +156,14 @@ export default function MapTab({ onSOS }) {
           width: '44px',
           height: '44px',
           borderRadius: '50%',
-          background: '#E24B4A',
+          background: '#D4537E',
           border: 'none',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          boxShadow: '0 2px 10px rgba(226,75,74,0.4)',
+          boxShadow: '0 2px 10px rgba(212,83,126,0.4)',
         }}
       >
         <span style={{ color: '#fff', fontSize: '12px', fontWeight: 700 }}>SOS</span>

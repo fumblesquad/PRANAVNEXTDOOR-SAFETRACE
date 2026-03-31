@@ -35,39 +35,46 @@ export default function SOS() {
     };
   }, [navigateToApp]);
 
-  async function handleSOS(e) {
+  const handleSOS = async (e) => {
     e.stopPropagation();
-    setFlashing(true);
+    
+    // 1. Flash screen red
+    document.body.style.backgroundColor = '#CE2029';
+    setTimeout(() => { document.body.style.backgroundColor = ''; }, 1500);
 
-    // Get location
-    let location = null;
-    try {
-      const pos = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
-      });
-      location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-    } catch {
-      // Location unavailable — continue without it
-    }
-
-    // Submit SOS report
-    try {
-      await submitReport({
-        type: 'sos',
-        description: 'Emergency SOS triggered',
-        location,
-        uid: user?.uid ?? null,
-      });
-    } catch (err) {
-      console.error('SOS report failed:', err);
-    }
-
-    // Call emergency number
+    // 2. Call 112
     window.location.href = 'tel:112';
 
-    // Reset flash after 1.5s
-    setTimeout(() => setFlashing(false), 1500);
-  }
+    // 3. Get location
+    let locationData = { lat: null, lng: null, label: 'Location unavailable' };
+    try {
+      const pos = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 })
+      );
+      locationData = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        label: `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`
+      };
+    } catch {
+      // location unavailable — still submit the report
+    }
+
+    // 4. Submit to Supabase
+    try {
+      const { caseId, error } = await submitReport({
+        type: 'sos',
+        description: 'SOS emergency triggered',
+        location: locationData,
+        uid: user?.id ?? null
+      });
+      if (!error && caseId) {
+        console.log('SOS report filed:', caseId);
+      }
+    } catch {
+      // fail silently — SOS call already made, don't block user
+    }
+  };
 
   function handleBackgroundClick(e) {
     // Navigate to app when clicking anywhere except the SOS button
@@ -79,14 +86,14 @@ export default function SOS() {
       onClick={handleBackgroundClick}
       style={{
         minHeight: '100vh',
-        background: flashing ? '#E24B4A' : '#0a0a0a',
+        background: '#0a0a0a',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         padding: '60px 24px 40px',
-        transition: 'background 0.15s ease-out',
         cursor: 'pointer',
+        position: 'relative'
       }}
     >
       <style>{`
@@ -94,101 +101,102 @@ export default function SOS() {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
         }
-        @keyframes sosPulseRing {
-          0% { transform: scale(1); opacity: 0.4; }
-          100% { transform: scale(1.4); opacity: 0; }
+        @keyframes pulse-ring {
+          0% { transform: scale(0.95); opacity: 0.5; }
+          70% { transform: scale(1.05); opacity: 0; }
+          100% { transform: scale(1.05); opacity: 0; }
         }
       `}</style>
 
-      {/* Logo */}
-      <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
-        <svg width="40" height="40" viewBox="0 0 34 34" fill="none">
-          <path 
-            d="M17 3L5 8v10c0 7.18 5.82 13 12 13s12-5.82 12-13V8L17 3z"
-            fill="none" 
-            stroke={flashing ? '#fff' : '#D4537E'} 
-            strokeWidth="2" 
-            strokeLinejoin="round"
-          />
-          <path 
-            d="M12 17l3.5 3.5L22 14"
-            stroke={flashing ? '#fff' : '#D4537E'} 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          />
-        </svg>
-        <p style={{ 
-          color: flashing ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', 
-          fontSize: '13px', 
-          fontWeight: 600,
-          marginTop: '8px',
-          letterSpacing: '1px',
-        }}>
-          SafeTrace
-        </p>
+      {/* Title Header */}
+      <div style={{
+        position: 'absolute',
+        top: '48px',
+        left: 0,
+        right: 0,
+        textAlign: 'center'
+      }}>
+        <span style={{ fontSize: '28px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px' }}>
+          Safe<span style={{ color: '#CE2029' }}>Trace</span>
+        </span>
       </div>
 
-      {/* SOS Button */}
-      <button
-        onClick={handleSOS}
-        style={{
-          width: '180px',
-          height: '180px',
-          borderRadius: '50%',
-          background: '#E24B4A',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          transition: 'transform 0.1s ease-out',
-          boxShadow: '0 0 60px rgba(226,75,74,0.3)',
-        }}
-        onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-        onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-        onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
-      >
-        {/* Outer ring */}
-        <div style={{
-          position: 'absolute',
-          inset: '-8px',
-          borderRadius: '50%',
-          border: '2px solid rgba(226,75,74,0.3)',
-          pointerEvents: 'none',
-        }} />
-        
-        {/* Pulse ring */}
-        <div style={{
-          position: 'absolute',
-          inset: '-8px',
-          borderRadius: '50%',
-          border: '2px solid rgba(226,75,74,0.4)',
-          animation: 'sosPulseRing 2s ease-out infinite',
-          pointerEvents: 'none',
-        }} />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '40px' }}>
+        {/* SOS Button Layout */}
+        <div style={{ position: 'relative', width: 270, height: 270, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          
+          {/* Animated Pulse Ring */}
+          <div style={{
+            position: 'absolute',
+            width: '270px',
+            height: '270px',
+            borderRadius: '50%',
+            border: '1px solid rgba(206,32,41,0.15)',
+            animation: 'pulse-ring 2s ease-out infinite',
+            pointerEvents: 'none',
+          }} />
 
-        <span style={{
-          color: '#fff',
-          fontSize: '32px',
-          fontWeight: 700,
-          letterSpacing: '4px',
-          pointerEvents: 'none',
-        }}>
-          SOS
-        </span>
-        <span style={{
-          color: 'rgba(255,255,255,0.6)',
-          fontSize: '11px',
-          marginTop: '6px',
-          pointerEvents: 'none',
-        }}>
-          Press in emergency
-        </span>
-      </button>
+          {/* Static Outer Ring */}
+          <div style={{
+            position: 'absolute',
+            width: '240px',
+            height: '240px',
+            borderRadius: '50%',
+            border: '3px solid rgba(206,32,41,0.35)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Inner Button */}
+          <button
+            onClick={handleSOS}
+            onTouchEnd={handleSOS}
+            style={{
+              width: '200px',
+              height: '200px',
+              borderRadius: '50%',
+              background: '#CE2029',
+              border: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 2,
+              transition: 'transform 0.1s ease-out',
+            }}
+            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+          >
+            <span style={{ color: '#fff', fontSize: '36px', fontWeight: 700, letterSpacing: '4px', pointerEvents: 'none' }}>
+              SOS
+            </span>
+            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', marginTop: '6px', pointerEvents: 'none' }}>
+              Press in emergency
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '24px', zIndex: 2 }}>
+        {/* 3 Chip Indicators */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: 300 }}>
+          {['Calls 112', 'Anonymous', 'Auto-files report'].map(chip => (
+            <div key={chip} style={{ 
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '16px', 
+              padding: '6px 12px', 
+              color: '#aaa', 
+              fontSize: '11px', 
+              fontWeight: 500,
+              pointerEvents: 'none'
+            }}>
+              {chip}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Swipe up hint */}
       <div style={{ 
@@ -197,13 +205,15 @@ export default function SOS() {
         alignItems: 'center',
         gap: '6px',
         pointerEvents: 'none',
+        position: 'absolute',
+        bottom: '24px'
       }}>
         <svg 
           width="20" 
           height="20" 
           viewBox="0 0 24 24" 
           fill="none" 
-          stroke={flashing ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.3)'}
+          stroke="rgba(255,255,255,0.3)"
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round"
@@ -211,10 +221,7 @@ export default function SOS() {
         >
           <polyline points="18 15 12 9 6 15" />
         </svg>
-        <span style={{ 
-          color: flashing ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.3)', 
-          fontSize: '11px',
-        }}>
+        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>
           swipe up
         </span>
       </div>
