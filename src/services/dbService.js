@@ -58,6 +58,7 @@
  */
 
 import { supabase } from './supabase'
+import { EMERGENCY_NUMBER } from '../config/emergency'
 
 // ─── Normalizers ─────────────────────────────────────────────────────────────
 
@@ -314,4 +315,55 @@ export async function getZones(city) {
 
   if (error) throw error
   return data.map(normalizeZone)
+}
+
+// ─── SOS Dispatch ─────────────────────────────────────────────────────────────
+
+/**
+ * The single SOS dispatch action:
+ *   1. Attempts to capture geolocation (5 s timeout).
+ *   2. Submits an anonymous SOS report (failures are non-blocking).
+ *   3. Opens the emergency dialer.
+ *
+ * @param {string|{uid?: string|null, fallbackLocation?: {lat?: number|string, lng?: number|string}}|null} uidOrOptions
+ *   Optional user UID or an options object.
+ * @param {{lat?: number|string, lng?: number|string}|null} fallbackLocation
+ *   Optional backup location when browser geolocation is unavailable.
+ */
+export async function dispatchSOS(uidOrOptions = null, fallbackLocation = null) {
+  let uid = uidOrOptions
+  let fallback = fallbackLocation
+
+  if (uidOrOptions && typeof uidOrOptions === 'object' && !Array.isArray(uidOrOptions)) {
+    uid = uidOrOptions.uid ?? null
+    fallback = uidOrOptions.fallbackLocation ?? null
+  }
+
+  let location = null
+  try {
+    const pos = await new Promise((resolve, reject) =>
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 })
+    )
+    location = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+  } catch {
+    if (fallback?.lat != null && fallback?.lng != null) {
+      location = {
+        lat: Number(fallback.lat),
+        lng: Number(fallback.lng),
+      }
+    }
+  }
+
+  try {
+    await submitReport({
+      type: 'sos',
+      description: 'Emergency SOS triggered',
+      location,
+      uid,
+    })
+  } catch (err) {
+    console.error('[SOS] report submission failed:', err)
+  }
+
+  window.location.href = `tel:${EMERGENCY_NUMBER}`
 }

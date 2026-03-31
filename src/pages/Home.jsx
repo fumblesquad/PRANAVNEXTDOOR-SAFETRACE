@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { usePageNav } from '../context/PageNavContext';
-import SOSButton from '../components/SOSButton';
 import IncidentFeed from '../components/IncidentFeed';
 import MapPreview from '../components/MapPreview';
 
@@ -92,21 +91,6 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100%', background: '#0a0a0a', color: '#fff' }}>
-      {/* SOS section */}
-      <section style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '56px 24px 48px',
-        borderBottom: '1px solid #181818',
-      }}>
-        <SOSButton />
-        <p style={{ color: '#444', fontSize: '12px', marginTop: '14px' }}>
-          Calls 112 · files anonymous report
-        </p>
-      </section>
-
       {/* Quick Report */}
       <section style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 24px 0' }}>
         <h2 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '16px', color: '#ccc', textTransform: 'uppercase', letterSpacing: '1px' }}>Quick Report</h2>

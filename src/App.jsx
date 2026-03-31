@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { dispatchSOS } from './services/dbService';
 
 // ═══════════════════════════════════════════════════════════════════
 // SAFETRACE v2 — Phone-Frame Mobile Safety App
@@ -201,7 +202,6 @@ function SplashScreen({ onDone }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-
 function PhoneFrame({ children }) {
   return (
     <div style={{ height: '100dvh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a', overflow: 'hidden' }}>
@@ -213,23 +213,17 @@ function PhoneFrame({ children }) {
 // ═══════════════════════════════════════════════════════════════════
 function SOSOverlay({ onClose, fallbackLocation }) {
   const [phase, setPhase] = useState('first');
-  const sentRef = useRef(false);
-  useEffect(() => {
-    if (phase === 'first') sentRef.current = false;
-  }, [phase]);
-  useEffect(() => {
-    if (phase !== 'sending' || sentRef.current) return;
-    sentRef.current = true;
-    sendSOSAlert({ fallbackLocation }).catch(error => {
-      console.error('[SOS] Overlay alert insert failed:', error);
-    });
-  }, [phase, fallbackLocation]);
   const handleTap = () => {
     if (phase === 'first') { setPhase('confirm'); return; }
     if (phase === 'confirm') {
       setPhase('sending');
-      window.location.href = 'tel:100';
-      setTimeout(() => { setPhase('sent'); setTimeout(() => onClose(), 2200); }, 1800);
+      Promise.allSettled([
+        sendSOSAlert({ fallbackLocation }),
+        dispatchSOS(null, fallbackLocation),
+      ]).finally(() => {
+        setPhase('sent');
+        setTimeout(() => onClose(), 2200);
+      });
     }
   };
   const isRed = phase === 'confirm' || phase === 'sending'; const isSent = phase === 'sent';
@@ -697,23 +691,17 @@ function BottomNav({ activeTab, onMap, onComplaint, onTrack }) {
 // ═══════════════════════════════════════════════════════════════════
 function LandingPage({ onEnter, onPolicePortal, fallbackLocation, activeSOSCount }) {
   const [phase, setPhase] = useState('first'); // first | confirm | sending | sent
-  const sentRef = useRef(false);
-  useEffect(() => {
-    if (phase === 'first') sentRef.current = false;
-  }, [phase]);
-  useEffect(() => {
-    if (phase !== 'sending' || sentRef.current) return;
-    sentRef.current = true;
-    sendSOSAlert({ fallbackLocation }).catch(error => {
-      console.error('[SOS] Landing alert insert failed:', error);
-    });
-  }, [phase, fallbackLocation]);
   const handleTap = () => {
     if (phase === 'first') { setPhase('confirm'); return; }
     if (phase === 'confirm') {
       setPhase('sending');
-      window.location.href = 'tel:100';
-      setTimeout(() => { setPhase('sent'); setTimeout(() => { setPhase('first'); }, 2500); }, 1800);
+      Promise.allSettled([
+        sendSOSAlert({ fallbackLocation }),
+        dispatchSOS(null, fallbackLocation),
+      ]).finally(() => {
+        setPhase('sent');
+        setTimeout(() => { setPhase('first'); }, 2500);
+      });
     }
   };
   const isRed = phase === 'confirm' || phase === 'sending'; const isSent = phase === 'sent';
