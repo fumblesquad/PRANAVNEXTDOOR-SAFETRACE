@@ -1,0 +1,135 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background: #000;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #0a0a0a;
+  color: #fff;
+  overscroll-behavior: none;
+  max-width: 430px;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  max-width: 430px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: #fff;
+}
+
+p {
+  margin: 0;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  color-scheme: dark;
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Active/pressed state for all interactive elements */
+button:active {
+  transform: scale(0.97);
+  filter: brightness(0.88);
+}
+
+a:active {
+  opacity: 0.7;
+}
+
+/* Swipe container — hides scrollbar */
+.swipe-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.swipe-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Snap pages */
+.snap-page {
+  width: 100vw;
+  height: 100vh;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+}
+
+.snap-page-map {
+  overflow: hidden;
+}
+
+/* Leaflet stacking context fix */
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  z-index: auto;
+}
+
+/* Leaflet popup dark styling */
+.leaflet-popup-content-wrapper {
+  background: #111 !important;
+  border: 1px solid #222 !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #111 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+}
+
+/* SOS trigger animation only — no idle animation */
+@keyframes sosPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
