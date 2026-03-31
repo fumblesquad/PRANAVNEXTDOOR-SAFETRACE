@@ -60,6 +60,42 @@ const STATIC_SAFE_PLACES = [
   { id: 'cr-11', name: 'Phoenix MarketCity', lat: 12.9914, lng: 80.2183, tags: ['crowd'] },
   { id: 'cr-12', name: 'Forum Vijaya Mall', lat: 13.0411, lng: 80.2104, tags: ['crowd'] },
 ];
+
+const STATIC_UNSAFE_ZONES = [
+  { id: 'uz-01', lat: 13.0067, lng: 80.2206, type: 'isolated_flyover', risk: 0.80, radius: 220, label: 'Guindy Flyover Underpass', note: 'Isolated underpass, poor lighting at night', source: 'static' },
+  { id: 'uz-02', lat: 12.9800, lng: 80.2500, type: 'empty_it_corridor_night', risk: 0.70, radius: 350, label: 'OMR Empty IT Stretch', note: 'Deserted after office hours', source: 'static' },
+  { id: 'uz-03', lat: 13.0700, lng: 80.2600, type: 'busy_junction', risk: 0.60, radius: 180, label: 'Royapettah Busy Junction', note: 'High traffic chaos', source: 'static' },
+  { id: 'uz-04', lat: 13.1020, lng: 80.2924, type: 'waterway_edge', risk: 0.75, radius: 200, label: 'Buckingham Canal - Tondiarpet', note: 'No railing, poor lighting', source: 'static' },
+  { id: 'uz-05', lat: 13.0482, lng: 80.2791, type: 'isolated_beach_stretch', risk: 0.78, radius: 300, label: 'Marina North - Unlit Beach', note: 'Unlit northern stretch', source: 'static' },
+  { id: 'uz-06', lat: 12.9753, lng: 80.2148, type: 'isolated_flyover', risk: 0.72, radius: 180, label: 'Velachery Flyover Underbelly', note: 'Narrow passage under expressway', source: 'static' },
+  { id: 'uz-07', lat: 13.0910, lng: 80.1743, type: 'deserted_industrial', risk: 0.82, radius: 280, label: 'Ambattur Old Industrial Estate', note: 'Abandoned mill sheds', source: 'static' },
+  { id: 'uz-08', lat: 13.1342, lng: 80.2892, type: 'waterway_edge', risk: 0.73, radius: 200, label: 'Ennore Creek Bank', note: 'Remote creek bank', source: 'static' },
+  { id: 'uz-09', lat: 12.9524, lng: 80.1381, type: 'construction_zone', risk: 0.68, radius: 240, label: 'Tambaram West Construction', note: 'Poor lighting after dusk', source: 'static' },
+  { id: 'uz-10', lat: 13.0621, lng: 80.1681, type: 'waste_ground', risk: 0.71, radius: 260, label: 'Maduravoyal Vacant Lots', note: 'Minimal surveillance', source: 'static' },
+  { id: 'uz-11', lat: 13.0212, lng: 80.2987, type: 'isolated_beach_stretch', risk: 0.76, radius: 300, label: 'Thiruvanmiyur Unlit Beach', note: 'Poorly lit beachfront', source: 'static' },
+  { id: 'uz-12', lat: 13.0839, lng: 80.2191, type: 'dark_alleyway', risk: 0.69, radius: 140, label: 'Kilpauk Back Lanes', note: 'Narrow unlit lanes', source: 'static' },
+  { id: 'uz-13', lat: 13.1178, lng: 80.2603, type: 'late_night_bus_stand', risk: 0.65, radius: 150, label: 'Perambur Night Bus Shelter', note: 'Isolated after midnight', source: 'static' },
+  { id: 'uz-14', lat: 12.9145, lng: 80.1952, type: 'empty_it_corridor_night', risk: 0.73, radius: 320, label: 'Sholinganallur Night Stretch', note: 'Empty post-10 PM', source: 'static' },
+  { id: 'uz-15', lat: 13.0029, lng: 80.1769, type: 'deserted_industrial', risk: 0.77, radius: 300, label: 'Ramapuram Industrial Back Road', note: 'No pedestrian lighting', source: 'static' },
+  { id: 'uz-16', lat: 13.0943, lng: 80.2804, type: 'waterway_edge', risk: 0.70, radius: 180, label: 'Cooum River - Perambur', note: 'Unguarded riverbank', source: 'static' },
+  { id: 'uz-17', lat: 13.0614, lng: 80.2902, type: 'dark_alleyway', risk: 0.67, radius: 120, label: 'Royapuram Fish Market Alleys', note: 'Deserted after market hours', source: 'static' },
+  { id: 'uz-18', lat: 12.9892, lng: 80.1586, type: 'construction_zone', risk: 0.74, radius: 260, label: 'Porur Flyover Construction', note: 'Dark detour lanes at night', source: 'static' },
+  { id: 'uz-19', lat: 13.0375, lng: 80.2478, type: 'busy_junction', risk: 0.62, radius: 170, label: 'Kodambakkam Junction', note: 'Night-time harassment risk', source: 'static' },
+  { id: 'uz-20', lat: 13.1254, lng: 80.2318, type: 'waste_ground', risk: 0.72, radius: 240, label: 'Kolathur Vacant Ground', note: 'No lighting or surveillance', source: 'static' },
+  { id: 'uz-21', lat: 12.9631, lng: 80.2393, type: 'isolated_flyover', risk: 0.78, radius: 200, label: 'Medavakkam Flyover Underpass', note: 'Long isolated underpass', source: 'static' },
+  { id: 'uz-22', lat: 13.0752, lng: 80.1893, type: 'deserted_industrial', risk: 0.80, radius: 290, label: 'Padi Industrial Area', note: 'Deserted after 8 PM', source: 'static' },
+  { id: 'uz-23', lat: 13.1467, lng: 80.2489, type: 'late_night_bus_stand', risk: 0.63, radius: 140, label: 'Thiruvottiyur Night Bus Stop', note: 'Minimal foot traffic', source: 'static' },
+  { id: 'uz-24', lat: 12.9301, lng: 80.2111, type: 'empty_it_corridor_night', risk: 0.69, radius: 300, label: 'Perungudi IT Park Late Night', note: 'Deserted service road', source: 'static' },
+  { id: 'uz-25', lat: 13.0154, lng: 80.2634, type: 'dark_alleyway', risk: 0.66, radius: 130, label: 'Adyar Market Back Lanes', note: 'Unlit service alleys', source: 'static' },
+  { id: 'uz-26', lat: 13.0831, lng: 80.3007, type: 'waterway_edge', risk: 0.71, radius: 180, label: 'Otteri Nullah - North Chennai', note: 'Open nullah, unlit', source: 'static' },
+  { id: 'uz-27', lat: 12.9458, lng: 80.1743, type: 'waste_ground', risk: 0.74, radius: 250, label: 'Chitlapakkam Open Ground', note: 'Unlit vacant area', source: 'static' },
+  { id: 'uz-28', lat: 13.0697, lng: 80.3048, type: 'isolated_beach_stretch', risk: 0.80, radius: 320, label: 'Foreshore Estate Beach', note: 'No lighting or patrols', source: 'static' },
+  { id: 'uz-29', lat: 13.0253, lng: 80.1984, type: 'construction_zone', risk: 0.70, radius: 220, label: 'Alandur Metro Construction', note: 'Dark detour around site', source: 'static' },
+  { id: 'uz-30', lat: 13.1379, lng: 80.2714, type: 'deserted_industrial', risk: 0.76, radius: 270, label: 'Manali Industrial Estate', note: 'Isolated refinery roads', source: 'static' },
+  { id: 'uz-31', lat: 13.0489, lng: 80.2048, type: 'dark_alleyway', risk: 0.64, radius: 130, label: 'Vadapalani Back Streets', note: 'Unlit after 10 PM', source: 'static' },
+  { id: 'uz-32', lat: 12.9720, lng: 80.1916, type: 'isolated_flyover', risk: 0.75, radius: 190, label: 'Pallavaram Flyover Underpass', note: 'Dimly lit near burial ground', source: 'static' },
+  { id: 'uz-33', lat: 13.0907, lng: 80.2485, type: 'busy_junction', risk: 0.61, radius: 160, label: 'Ayanavaram Bus Junction', note: 'Chaotic, harassment risk', source: 'static' },
+];
 const HAZARD_WEIGHTS = [{ pattern: /murder|homicide|kill/gi, type: 'crime_violent', base: 0.80 }, { pattern: /assault|attack|stab|shoot/gi, type: 'crime_violent', base: 0.70 }, { pattern: /robbery|loot|snatch|theft|burglary/gi, type: 'crime_property', base: 0.60 }, { pattern: /rape|sexual|molest|harass/gi, type: 'crime_sexual', base: 0.85 }, { pattern: /accident|crash|collision|hit\.and\.run/gi, type: 'road_accident', base: 0.50 }, { pattern: /flood|waterlog|inundat/gi, type: 'flood', base: 0.60 }, { pattern: /fire|blaze|burn/gi, type: 'fire', base: 0.65 }, { pattern: /protest|riot|agitation|bandh/gi, type: 'civil_unrest', base: 0.40 }];
 
 async function fetchNearbyPlaces(lat, lng, apiKey) { const types = [{ type: 'police', tag: 'police', radius: 5000 }, { type: 'hospital', tag: 'hospital', radius: 5000 }, { type: 'university', tag: 'school', radius: 5000 }, { type: 'shopping_mall', tag: 'crowd', radius: 5000 }, { type: 'train_station', tag: 'crowd', radius: 5000 }]; const all = [], seen = new Set(); await Promise.allSettled(types.map(async ({ type, tag, radius }) => { try { const data = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${apiKey}`).then(r => r.json()); if (data.status === 'OK' && data.results) for (const p of data.results) { if (seen.has(p.place_id)) continue; seen.add(p.place_id); all.push({ id: `gp-${p.place_id}`, name: p.name, lat: p.geometry.location.lat, lng: p.geometry.location.lng, tags: [tag], source: 'google', rating: p.rating || null, vicinity: p.vicinity || '', openNow: p.opening_hours?.open_now ?? null }); } } catch (e) { } })); return all; }
@@ -1105,7 +1141,7 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
 
 // ═══════════════════════════════════════════════════════════════════
 function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPinChange }) {
-  const [pin, setPin] = useState(null); const [nearby, setNearby] = useState([]); const [dest, setDest] = useState(null); const [routeData, setRouteData] = useState(null); const [loading, setLoading] = useState(false); const [navigating, setNavigating] = useState(false); const [stepIndex, setStepIndex] = useState(0); const [showUnsafe, setShowUnsafe] = useState(true); const [safePlaces, setSafePlaces] = useState(STATIC_SAFE_PLACES); const [unsafeZones, setUnsafeZones] = useState([]); const [newsLoading, setNewsLoading] = useState(false); const [placesLoading, setPlacesLoading] = useState(false); const [dataStatus, setDataStatus] = useState({ places: 'static', news: 'idle' }); const [mapReady, setMapReady] = useState(false); const newsFetched = useRef(false);
+  const [pin, setPin] = useState(null); const [nearby, setNearby] = useState([]); const [dest, setDest] = useState(null); const [routeData, setRouteData] = useState(null); const [loading, setLoading] = useState(false); const [navigating, setNavigating] = useState(false); const [stepIndex, setStepIndex] = useState(0); const [showUnsafe, setShowUnsafe] = useState(true); const [safePlaces, setSafePlaces] = useState(STATIC_SAFE_PLACES); const [unsafeZones, setUnsafeZones] = useState(STATIC_UNSAFE_ZONES); const [newsLoading, setNewsLoading] = useState(false); const [placesLoading, setPlacesLoading] = useState(false); const [dataStatus, setDataStatus] = useState({ places: 'static', news: 'static' }); const [mapReady, setMapReady] = useState(false); const newsFetched = useRef(false);
   const [showArrival, setShowArrival] = useState(false); const [arrivedDest, setArrivedDest] = useState('');
   const hazardFeedEnabled = hasNewsHazardFeed();
   const placesFeedEnabled = Boolean(GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_API_KEY_HERE');
@@ -1114,19 +1150,19 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
   useEffect(() => {
     if (newsFetched.current) return;
     if (!hazardFeedEnabled) {
-      setUnsafeZones([]);
-      setDataStatus(p => ({ ...p, news: 'unavailable' }));
+      setUnsafeZones(STATIC_UNSAFE_ZONES);
+      setDataStatus(p => ({ ...p, news: 'static' }));
       return;
     }
     newsFetched.current = true;
     setNewsLoading(true);
     fetchNewsHazards(NEWSAPI_KEY)
       .then(nz => {
-        setUnsafeZones(nz);
-        setDataStatus(p => ({ ...p, news: nz.length > 0 ? 'live' : 'ready' }));
+        setUnsafeZones(nz && nz.length > 0 ? nz : STATIC_UNSAFE_ZONES);
+        setDataStatus(p => ({ ...p, news: nz && nz.length > 0 ? 'live' : 'static' }));
       })
       .catch(() => {
-        setUnsafeZones([]);
+        setUnsafeZones(STATIC_UNSAFE_ZONES);
         setDataStatus(p => ({ ...p, news: 'error' }));
       })
       .finally(() => setNewsLoading(false));
@@ -1173,7 +1209,7 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
   const safeCount = pin ? safePlaces.filter(p => (p.tags[0] === 'police' || p.tags[0] === 'hospital') && haversine(pin, p) <= 15000).length : safePlaces.filter(p => p.tags[0] === 'police' || p.tags[0] === 'hospital').length;
   const riskHigh = pin ? unsafeZones.filter(z => z.risk >= 0.75 && haversine(pin, { lat: z.lat, lng: z.lng }) <= 15000).length : unsafeZones.filter(z => z.risk >= 0.75).length;
   const riskTotal = pin ? unsafeZones.filter(z => haversine(pin, { lat: z.lat, lng: z.lng }) <= 15000).length : unsafeZones.length;
-  const showHazards = hazardFeedEnabled && showUnsafe;
+  const showHazards = showUnsafe;
 
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative', background: '#000000' }}>
@@ -1231,7 +1267,7 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
       {showHazards && !navigating && pin && <div style={{ position: 'absolute', bottom: 84, right: 10, zIndex: 800, background: 'rgba(7,7,14,0.88)', border: '1px solid #ffffff08', borderRadius: 14, padding: '8px 12px', backdropFilter: 'blur(12px)', fontFamily: "'DM Mono',monospace", fontSize: 8, letterSpacing: '0.08em' }}>{[{ l: 'HIGH', c: '#e81850' }, { l: 'MED', c: '#ff9500' }, { l: 'LOW', c: '#ffcc00' }].map(r => <div key={r.l} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: r.c, boxShadow: `0 0 4px ${r.c}` }} /><span style={{ color: r.c, fontSize: 8 }}>{r.l}</span></div>)}</div>}
 
       {/* Place drawer */}
-      {!navigating && <PlaceDrawer pin={pin} nearby={nearby} dest={dest} routeData={routeData} loading={loading} showUnsafe={showHazards} onToggleUnsafe={() => setShowUnsafe(v => !v)} onSelectDest={handleSelectDest} onStartNav={handleStartNav} onReset={handleReset} onChangeDest={handleChangeDest} placesLoading={placesLoading} canToggleHazards={hazardFeedEnabled} />}
+      {!navigating && <PlaceDrawer pin={pin} nearby={nearby} dest={dest} routeData={routeData} loading={loading} showUnsafe={showHazards} onToggleUnsafe={() => setShowUnsafe(v => !v)} onSelectDest={handleSelectDest} onStartNav={handleStartNav} onReset={handleReset} onChangeDest={handleChangeDest} placesLoading={placesLoading} canToggleHazards={true} />}
 
       {/* Nav overlay */}
       {navigating && routeData && <NavOverlay steps={routeData.steps} stepIndex={stepIndex} setStepIndex={setStepIndex} totalDist={routeData.totalDist} totalTime={routeData.totalTime} destName={dest?.name} onEnd={handleArrived} />}
