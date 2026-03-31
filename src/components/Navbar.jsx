@@ -27,10 +27,7 @@ export default function Navbar() {
       zIndex: 100,
     }}>
       <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ color: '#e81850', fontWeight: 800, fontSize: '18px', letterSpacing: '1px' }}>
-          SAFE
-        </span>
-        <span style={{ color: '#fff', fontWeight: 400, fontSize: '18px' }}>TRACE</span>
+        <img src="/favicon.svg" alt="SafeTrace Icon" style={{ height: '24px' }} />
       </Link>
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
