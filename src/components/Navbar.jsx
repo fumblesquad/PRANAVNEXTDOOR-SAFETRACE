@@ -27,7 +27,7 @@ export default function Navbar() {
       zIndex: 100,
     }}>
       <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ color: '#D4537E', fontWeight: 800, fontSize: '18px', letterSpacing: '1px' }}>
+        <span style={{ color: '#e81850', fontWeight: 800, fontSize: '18px', letterSpacing: '1px' }}>
           SAFE
         </span>
         <span style={{ color: '#fff', fontWeight: 400, fontSize: '18px' }}>TRACE</span>
@@ -39,7 +39,7 @@ export default function Navbar() {
             key={to}
             to={to}
             style={{
-              color: location.pathname === to ? '#D4537E' : '#aaa',
+              color: location.pathname === to ? '#e81850' : '#aaa',
               textDecoration: 'none',
               fontSize: '14px',
               fontWeight: location.pathname === to ? 600 : 400,

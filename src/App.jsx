@@ -10,7 +10,7 @@ const GOOGLE_API_KEY = 'AIzaSyCA0T4ya5yS9k-NeiHPXZvMKyLBnNz9-3U';
 const NEWSAPI_KEY = 'e8d48558cb3e46a3a0944a80a1857cbc';
 
 // ── Data helpers ─────────────────────────────────────────────────
-function riskColor(r) { return r >= 0.75 ? '#D4537E' : r >= 0.60 ? '#ff9500' : '#ffcc00'; }
+function riskColor(r) { return r >= 0.75 ? '#e81850' : r >= 0.60 ? '#ff9500' : '#ffcc00'; }
 const TAG_COLOR = { police: '#38bdf8', hospital: '#34d399', school: '#fbbf24', crowd: '#c084fc' };
 const TAG_ICON = { police: '🚔', hospital: '🏥', school: '🏫', crowd: '🏬' };
 const TAG_LABEL = { police: 'Police', hospital: 'Hospital', school: 'School', crowd: 'Public Area' };
@@ -149,14 +149,14 @@ const Styles = () => <style>{`
 html{color-scheme:dark;}
 button,input,textarea,select{color-scheme:dark;color:inherit;font:inherit;}
 html,body,#root{height:100%;width:100%;overflow:hidden;background:#0a0a0a;}
-::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#D4537E33;border-radius:2px;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#e8185033;border-radius:2px;}
 @keyframes breathe{0%,100%{opacity:.6;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.02);}}
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 @keyframes navIn{from{opacity:0;transform:translateY(-12px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 @keyframes stepFadeIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
-@keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,83,126,.4);}50%{box-shadow:0 0 0 20px rgba(212,83,126,0);}}
-@keyframes confirmPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,83,126,.5);}50%{box-shadow:0 0 0 24px rgba(212,83,126,0);}}
+@keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,24,80,.4);}50%{box-shadow:0 0 0 20px rgba(232,24,80,0);}}
+@keyframes confirmPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,24,80,.5);}50%{box-shadow:0 0 0 24px rgba(232,24,80,0);}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes scaleIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
 @keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
@@ -167,12 +167,12 @@ html,body,#root{height:100%;width:100%;overflow:hidden;background:#0a0a0a;}
 .st-popup .leaflet-popup-tip-container{display:none;}.leaflet-control-zoom{display:none;}
 .leaflet-control-attribution{display:none!important;}
 .nav-dot-outer{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:navRing 1.2s ease-in-out infinite;}
-.nav-dot-inner{width:14px;height:14px;background:#D4537E;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 10px #D4537Ecc;}
-@keyframes navRing{0%,100%{box-shadow:0 0 0 0 #D4537E55;}50%{box-shadow:0 0 0 8px #D4537E00;}}
+.nav-dot-inner{width:14px;height:14px;background:#e81850;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 10px #e81850cc;}
+@keyframes navRing{0%,100%{box-shadow:0 0 0 0 #e8185055;}50%{box-shadow:0 0 0 8px #e8185000;}}
 @keyframes newsPulse{0%,100%{opacity:0.85;}50%{opacity:1;}}
 @keyframes splashSafeUp{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-55%);opacity:0;}}
 @keyframes splashTraceDown{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(55%);opacity:0;}}
-@keyframes splashBorderGlow{0%{box-shadow:0 0 0 0 #D4537E00,inset 0 0 0 0 #D4537E00;}60%{box-shadow:0 0 40px 4px #D4537E44,inset 0 0 30px 0 #D4537E11;}100%{box-shadow:0 0 0 0 #D4537E00,inset 0 0 0 0 #D4537E00;}}
+@keyframes splashBorderGlow{0%{box-shadow:0 0 0 0 #e8185000,inset 0 0 0 0 #e8185000;}60%{box-shadow:0 0 40px 4px #e8185044,inset 0 0 30px 0 #e8185011;}100%{box-shadow:0 0 0 0 #e8185000,inset 0 0 0 0 #e8185000;}}
 @keyframes splashCollapseTop{0%{transform:translateY(0);}100%{transform:translateY(-100%);}}
 @keyframes splashCollapseBottom{0%{transform:translateY(0);}100%{transform:translateY(100%);}}
 `}</style>;
@@ -190,10 +190,10 @@ function SplashScreen({ onDone }) {
   const splitting = phase === 'split' || phase === 'collapse';
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 9999, background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, border: '1.5px solid #D4537E', pointerEvents: 'none', zIndex: 3, opacity: phase === 'collapse' ? 0 : 1, transition: 'opacity 0.4s ease', animation: phase === 'hold' ? 'splashBorderGlow 1.2s ease-in-out' : 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, border: '1.5px solid #e81850', pointerEvents: 'none', zIndex: 3, opacity: phase === 'collapse' ? 0 : 1, transition: 'opacity 0.4s ease', animation: phase === 'hold' ? 'splashBorderGlow 1.2s ease-in-out' : 'none' }} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 900, fontSize: 44, letterSpacing: '0.04em', color: '#ffffff', lineHeight: 1, display: 'inline-block', animation: splitting ? 'splashSafeUp 0.65s cubic-bezier(0.76,0,0.24,1) forwards' : 'none' }}>SAFE</span>
-        <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 900, fontSize: 44, letterSpacing: '0.04em', color: '#D4537E', lineHeight: 1, display: 'inline-block', animation: splitting ? 'splashTraceDown 0.65s cubic-bezier(0.76,0,0.24,1) forwards' : 'none' }}>TRACE</span>
+        <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 900, fontSize: 44, letterSpacing: '0.04em', color: '#e81850', lineHeight: 1, display: 'inline-block', animation: splitting ? 'splashTraceDown 0.65s cubic-bezier(0.76,0,0.24,1) forwards' : 'none' }}>TRACE</span>
       </div>
     </div>
   );
@@ -230,7 +230,7 @@ function SOSOverlay({ onClose }) {
           <button onClick={handleTap} disabled={phase === 'sending' || phase === 'sent'} style={{ width: 130, height: 130, borderRadius: '50%', background: isSent ? '#34d399' : isRed ? '#CE2029' : '#CE2029', border: 'none', color: '#fff', fontSize: isSent ? 40 : 32, fontWeight: 900, fontFamily: "'Poppins',sans-serif", cursor: phase === 'sending' || phase === 'sent' ? 'default' : 'pointer', animation: isRed && phase !== 'sending' ? 'confirmPulse 1.2s ease-in-out infinite' : phase === 'first' ? 'sosPulse 2s ease-in-out infinite' : 'none', transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)', position: 'relative', zIndex: 2, boxShadow: isSent ? '0 0 40px #34d39944' : isRed ? '0 0 50px rgba(206,32,41,0.4)' : '0 0 40px rgba(206,32,41,0.35)' }}>
             {isSent ? '✓' : phase === 'sending' ? <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', fontSize: 24 }}>◌</span> : 'SOS'}
           </button>
-          {(phase === 'first' || phase === 'confirm') && <div style={{ position: 'absolute', top: -10, left: -10, right: -10, bottom: -10, borderRadius: '50%', border: `2px solid ${isRed ? '#D4537E33' : '#D4537E22'}`, pointerEvents: 'none' }} />}
+          {(phase === 'first' || phase === 'confirm') && <div style={{ position: 'absolute', top: -10, left: -10, right: -10, bottom: -10, borderRadius: '50%', border: `2px solid ${isRed ? '#e8185033' : '#e8185022'}`, pointerEvents: 'none' }} />}
         </div>
         {isRed && phase === 'confirm' && <div style={{ fontSize: 13, fontWeight: 700, color: '#e8474f', fontFamily: "'Poppins',sans-serif", animation: 'fadeIn 0.3s ease', letterSpacing: '0.05em' }}>TAP AGAIN TO CONFIRM</div>}
         {phase === 'first' && <div style={{ fontSize: 11, color: '#ffffff22', fontFamily: "'Poppins',sans-serif" }}>Your location will be shared with authorities</div>}
@@ -300,12 +300,12 @@ function ComplaintPage({ onBack }) {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: 'CartoDB' }).addTo(map);
     map.on('click', e => {
       const { lat, lng } = e.latlng; if (locMarkerRef.current) map.removeLayer(locMarkerRef.current);
-      locMarkerRef.current = L.marker([lat, lng], { icon: L.divIcon({ className: '', html: `<div style="width:18px;height:18px;background:#D4537E;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px #D4537E40,0 0 16px #D4537E99"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map);
+      locMarkerRef.current = L.marker([lat, lng], { icon: L.divIcon({ className: '', html: `<div style="width:18px;height:18px;background:#e81850;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px #e8185040,0 0 16px #e8185099"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map);
       setPinnedLocation({ lat: lat.toFixed(4), lng: lng.toFixed(4) });
     });
     if (pinnedLocation) {
       const lat = parseFloat(pinnedLocation.lat), lng = parseFloat(pinnedLocation.lng);
-      locMarkerRef.current = L.marker([lat, lng], { icon: L.divIcon({ className: '', html: `<div style="width:18px;height:18px;background:#D4537E;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px #D4537E40,0 0 16px #D4537E99"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map); map.setView([lat, lng], 15);
+      locMarkerRef.current = L.marker([lat, lng], { icon: L.divIcon({ className: '', html: `<div style="width:18px;height:18px;background:#e81850;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px #e8185040,0 0 16px #e8185099"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map); map.setView([lat, lng], 15);
     }
     locMapInstanceRef.current = map;
   }, [pinningLocation]);
@@ -360,7 +360,7 @@ function ComplaintPage({ onBack }) {
       <div style={{ color: '#ffffff33', fontSize: 12, marginBottom: 20 }}>Your complaint has been recorded</div>
       <div style={{ background: '#0d0d14', border: '1px solid #ffffff10', borderRadius: 16, padding: '16px 24px', marginBottom: 16, width: '100%' }}>
         <div style={{ fontSize: 9, color: '#ffffff33', fontWeight: 600, letterSpacing: '0.12em', marginBottom: 6 }}>CASE ID</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#D4537E', fontFamily: "'DM Mono',monospace", letterSpacing: '0.08em' }}>{trackingId}</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#e81850', fontFamily: "'DM Mono',monospace", letterSpacing: '0.08em' }}>{trackingId}</div>
         <div style={{ fontSize: 10, color: '#ffffff22', marginTop: 6 }}>Save this ID to track your case</div>
       </div>
       <button onClick={() => { navigator.clipboard?.writeText(trackingId).catch(() => { }); const el = document.createElement('textarea'); el.value = trackingId; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); }} style={{ width: '100%', padding: '11px', background: '#ffffff08', border: '1px solid #ffffff14', borderRadius: 14, color: '#ffffff88', fontSize: 12, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
@@ -369,7 +369,7 @@ function ComplaintPage({ onBack }) {
       </button>
       <div style={{ display: 'flex', gap: 10, width: '100%' }}>
         <button onClick={handleNewReport} style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid #ffffff12', borderRadius: 16, color: '#ffffff55', fontSize: 12, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer' }}>New Report</button>
-        <button onClick={onBack} style={{ flex: 1, padding: '12px', background: '#D4537E', border: 'none', borderRadius: 16, color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer' }}>Back to Map</button>
+        <button onClick={onBack} style={{ flex: 1, padding: '12px', background: '#e81850', border: 'none', borderRadius: 16, color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer' }}>Back to Map</button>
       </div>
     </div>
   );
@@ -378,13 +378,13 @@ function ComplaintPage({ onBack }) {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#000000' }}>
       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, borderBottom: '1px solid #ffffff08' }}>
         <button onClick={() => setPinningLocation(false)} style={{ background: '#ffffff08', border: 'none', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer' }}>← Back</button>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#D4537E', fontFamily: "'Poppins',sans-serif" }}>Pin Location</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#e81850', fontFamily: "'Poppins',sans-serif" }}>Pin Location</span>
         <div style={{ width: 60 }} />
       </div>
       <div style={{ flex: 1, position: 'relative' }}>
         <div ref={locMapRef} style={{ height: '100%', width: '100%' }} />
-        {!pinnedLocation && <><div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 40, height: 40, borderRadius: '50%', border: '2px solid #D4537E66', pointerEvents: 'none', animation: 'sosPulse 2s ease-in-out infinite' }} /><div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: 'rgba(7,7,14,0.92)', border: '1px solid #D4537E28', color: '#fff', padding: '10px 24px', borderRadius: 24, fontSize: 12, fontFamily: "'Poppins',sans-serif", fontWeight: 500, pointerEvents: 'none', animation: 'breathe 2.4s ease-in-out infinite' }}>Tap to pin incident location</div></>}
-        {pinnedLocation && <div style={{ position: 'absolute', bottom: 32, left: 24, right: 24, display: 'flex', flexDirection: 'column', gap: 12, zIndex: 1000 }}><div style={{ background: 'rgba(7,7,14,0.92)', border: '1px solid #34d39933', color: '#34d399', padding: '12px 20px', borderRadius: 16, fontSize: 11, fontFamily: "'DM Mono',monospace", fontWeight: 500, textAlign: 'center' }}>📍 {pinnedLocation.lat}, {pinnedLocation.lng}</div><button onClick={() => setPinningLocation(false)} style={{ background: '#D4537E', border: 'none', borderRadius: 16, padding: '16px', color: '#fff', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', boxShadow: '0 0 24px #D4537E33', animation: 'fadeUp 0.3s ease' }}>Confirm Location</button></div>}
+        {!pinnedLocation && <><div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 40, height: 40, borderRadius: '50%', border: '2px solid #e8185066', pointerEvents: 'none', animation: 'sosPulse 2s ease-in-out infinite' }} /><div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: 'rgba(7,7,14,0.92)', border: '1px solid #e8185028', color: '#fff', padding: '10px 24px', borderRadius: 24, fontSize: 12, fontFamily: "'Poppins',sans-serif", fontWeight: 500, pointerEvents: 'none', animation: 'breathe 2.4s ease-in-out infinite' }}>Tap to pin incident location</div></>}
+        {pinnedLocation && <div style={{ position: 'absolute', bottom: 32, left: 24, right: 24, display: 'flex', flexDirection: 'column', gap: 12, zIndex: 1000 }}><div style={{ background: 'rgba(7,7,14,0.92)', border: '1px solid #34d39933', color: '#34d399', padding: '12px 20px', borderRadius: 16, fontSize: 11, fontFamily: "'DM Mono',monospace", fontWeight: 500, textAlign: 'center' }}>📍 {pinnedLocation.lat}, {pinnedLocation.lng}</div><button onClick={() => setPinningLocation(false)} style={{ background: '#e81850', border: 'none', borderRadius: 16, padding: '16px', color: '#fff', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', boxShadow: '0 0 24px #e8185033', animation: 'fadeUp 0.3s ease' }}>Confirm Location</button></div>}
       </div>
     </div>
   );
@@ -394,27 +394,27 @@ function ComplaintPage({ onBack }) {
       <div style={{ padding: '16px 20px 14px', flexShrink: 0, borderBottom: '1px solid #ffffff08' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={onBack} style={{ background: '#ffffff08', border: 'none', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer' }}>←</button>
-          <div><div style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>Report Incident</div><div style={{ fontSize: 10, color: '#ffffff28', marginTop: 2 }}>Help keep your community safe</div><div style={{ fontSize: 10, color: '#D4537E', marginTop: 4, fontWeight: 500 }}>Fields marked <span style={{ color: '#D4537E' }}>*</span> are required</div></div>
+          <div><div style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>Report Incident</div><div style={{ fontSize: 10, color: '#ffffff28', marginTop: 2 }}>Help keep your community safe</div><div style={{ fontSize: 10, color: '#e81850', marginTop: 4, fontWeight: 500 }}>Fields marked <span style={{ color: '#e81850' }}>*</span> are required</div></div>
         </div>
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 100px', background: '#000000' }}>
         <div style={{ marginBottom: 18, background: '#000000' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <label style={lbl}>WHAT HAPPENED?</label>
-            <span style={{ fontSize: 9, color: '#D4537E', fontWeight: 700, letterSpacing: '0.08em' }}>*</span>
+            <span style={{ fontSize: 9, color: '#e81850', fontWeight: 700, letterSpacing: '0.08em' }}>*</span>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, background: '#000000' }}>
-            {incidentTypes.map(t => { const active = form.type === t; return (<button key={t} onClick={() => setForm(f => ({ ...f, type: t, otherDesc: t !== 'Other' ? '' : f.otherDesc }))} style={{ padding: '10px 16px', borderRadius: 20, backgroundColor: active ? '#D4537E18' : '#0d0d14', border: `1px solid ${active ? '#D4537E' : '#ffffff0c'}`, color: active ? '#D4537E' : '#ffffff55', fontSize: 12, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', transition: 'all 0.15s' }}>{t}</button>); })}
+            {incidentTypes.map(t => { const active = form.type === t; return (<button key={t} onClick={() => setForm(f => ({ ...f, type: t, otherDesc: t !== 'Other' ? '' : f.otherDesc }))} style={{ padding: '10px 16px', borderRadius: 20, backgroundColor: active ? '#e8185018' : '#0d0d14', border: `1px solid ${active ? '#e81850' : '#ffffff0c'}`, color: active ? '#e81850' : '#ffffff55', fontSize: 12, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', transition: 'all 0.15s' }}>{t}</button>); })}
           </div>
         </div>
         {form.type === 'Other' && <div style={{ marginBottom: 18, animation: 'fadeUp 0.25s ease' }}><label style={lbl}>DESCRIBE THE INCIDENT TYPE</label><input type="text" placeholder="e.g., Suspicious activity, Vandalism..." value={form.otherDesc} onChange={e => setForm(f => ({ ...f, otherDesc: e.target.value }))} style={inp} /></div>}
         <div style={{ marginBottom: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <label style={lbl}>INCIDENT LOCATION</label>
-            <span style={{ fontSize: 9, color: '#D4537E', fontWeight: 700, letterSpacing: '0.08em' }}>*</span>
+            <span style={{ fontSize: 9, color: '#e81850', fontWeight: 700, letterSpacing: '0.08em' }}>*</span>
           </div>
           <button onClick={() => setPinningLocation(true)} style={{ width: '100%', padding: '16px', background: pinnedLocation ? '#0d1410' : '#0d0d14', border: `1px solid ${pinnedLocation ? '#34d39933' : '#ffffff0c'}`, borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, transition: 'all 0.2s' }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: pinnedLocation ? '#34d39912' : '#D4537E10', border: `1px solid ${pinnedLocation ? '#34d39933' : '#D4537E33'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{pinnedLocation ? '📍' : '🗺️'}</div>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', background: pinnedLocation ? '#34d39912' : '#e8185010', border: `1px solid ${pinnedLocation ? '#34d39933' : '#e8185033'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{pinnedLocation ? '📍' : '🗺️'}</div>
             {pinnedLocation ? <><div style={{ fontSize: 12, color: '#34d399', fontWeight: 600 }}>Location Pinned</div><div style={{ fontSize: 10, color: '#ffffff33', fontFamily: "'DM Mono',monospace" }}>{pinnedLocation.lat}, {pinnedLocation.lng}</div></> : <div style={{ fontSize: 13, color: '#ffffff44' }}>Tap to pin location on map</div>}
           </button>
         </div>
@@ -422,14 +422,14 @@ function ComplaintPage({ onBack }) {
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               <label style={lbl}>DATE</label>
-              <span style={{ fontSize: 9, color: '#D4537E', fontWeight: 700 }}>*</span>
+              <span style={{ fontSize: 9, color: '#e81850', fontWeight: 700 }}>*</span>
             </div>
             <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ ...inp, colorScheme: 'dark' }} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               <label style={lbl}>TIME</label>
-              <span style={{ fontSize: 9, color: '#D4537E', fontWeight: 700 }}>*</span>
+              <span style={{ fontSize: 9, color: '#e81850', fontWeight: 700 }}>*</span>
             </div>
             <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))} style={{ ...inp, colorScheme: 'dark' }} />
           </div>
@@ -448,7 +448,7 @@ function ComplaintPage({ onBack }) {
           </div>
           <input ref={fileInputRef} type="file" accept="image/*,video/*,audio/*" multiple onChange={handleFileUpload} style={{ display: 'none' }} />
           <button onClick={() => fileInputRef.current?.click()} style={{ width: '100%', padding: '18px 16px', background: '#0d0d14', border: '2px dashed #ffffff12', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#D4537E10', border: '1px solid #D4537E33', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📎</div>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#e8185010', border: '1px solid #e8185033', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📎</div>
             <span style={{ fontSize: 12, color: '#ffffff44', fontWeight: 500 }}>Upload photos, videos, or audio</span>
           </button>
           {form.evidence.length > 0 && <div style={{ display: 'flex', gap: 8, marginTop: 10, overflowX: 'auto', padding: '4px 0' }}>
@@ -458,13 +458,13 @@ function ComplaintPage({ onBack }) {
                   <span style={{ fontSize: 18 }}>{ev.type.startsWith('video') ? '🎬' : '🎤'}</span>
                   <span style={{ fontSize: 7, color: '#ffffff33', maxWidth: 56, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.name}</span>
                 </div>}
-              <button onClick={() => removeEvidence(i)} style={{ position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: '50%', background: '#D4537E', border: 'none', color: '#fff', fontSize: 9, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✕</button>
+              <button onClick={() => removeEvidence(i)} style={{ position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: '50%', background: '#e81850', border: 'none', color: '#fff', fontSize: 9, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✕</button>
             </div>)}
           </div>}
         </div>
       </div>
       <div style={{ position: 'absolute', bottom: 72, left: 0, right: 0, padding: '12px 20px', background: 'linear-gradient(0deg,rgba(7,7,14,1) 60%,rgba(7,7,14,0) 100%)', zIndex: 10 }}>
-        <button onClick={handleSubmit} disabled={!canSubmit} style={{ width: '100%', padding: '16px', background: canSubmit ? '#D4537E' : '#1a0c14', border: 'none', borderRadius: 16, color: canSubmit ? '#fff' : '#ffffff1a', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: canSubmit ? 'pointer' : 'not-allowed', boxShadow: canSubmit ? '0 0 30px #D4537E33' : 'none', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <button onClick={handleSubmit} disabled={!canSubmit} style={{ width: '100%', padding: '16px', background: canSubmit ? '#e81850' : '#1a0c14', border: 'none', borderRadius: 16, color: canSubmit ? '#fff' : '#ffffff1a', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: canSubmit ? 'pointer' : 'not-allowed', boxShadow: canSubmit ? '0 0 30px #e8185033' : 'none', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
           {submitting && <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>◌</span>}
           {submitting ? 'Submitting...' : 'Submit Report'}
         </button>
@@ -481,17 +481,17 @@ function NavOverlay({ steps, stepIndex, setStepIndex, totalDist, totalTime, dest
   const remDist = remDistM > 1000 ? (remDistM / 1000).toFixed(1) + ' km' : Math.round(remDistM) + ' m';
   const remTime = stepIndex === 0 ? totalTime : (Math.max(1, Math.ceil(remDistM / 80)) + ' min');
   return (<div style={{ position: 'absolute', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
-    <div style={{ pointerEvents: 'all', margin: '10px 12px 0', background: 'rgba(7,7,14,0.97)', border: '1px solid #D4537E55', borderRadius: 18, padding: '14px 16px 12px', backdropFilter: 'blur(24px)', boxShadow: '0 12px 48px rgba(212,83,126,0.22)', animation: 'navIn 0.35s cubic-bezier(0.34,1.4,0.64,1)', fontFamily: "'DM Mono',monospace" }}>
-      <div style={{ height: 3, background: '#ffffff08', borderRadius: 2, marginBottom: 12, overflow: 'hidden' }}><div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#D4537E,#ff6090)', borderRadius: 2, transition: 'width 0.6s', boxShadow: '0 0 8px #D4537E' }} /></div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}><span style={{ fontSize: 9, color: '#D4537E', letterSpacing: '0.18em' }}>STEP {stepIndex + 1}/{steps.length}</span><span style={{ fontSize: 9, color: '#ffffff33', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>→ {destName}</span></div>
+    <div style={{ pointerEvents: 'all', margin: '10px 12px 0', background: 'rgba(7,7,14,0.97)', border: '1px solid #e8185055', borderRadius: 18, padding: '14px 16px 12px', backdropFilter: 'blur(24px)', boxShadow: '0 12px 48px rgba(232,24,80,0.22)', animation: 'navIn 0.35s cubic-bezier(0.34,1.4,0.64,1)', fontFamily: "'DM Mono',monospace" }}>
+      <div style={{ height: 3, background: '#ffffff08', borderRadius: 2, marginBottom: 12, overflow: 'hidden' }}><div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#e81850,#ff6090)', borderRadius: 2, transition: 'width 0.6s', boxShadow: '0 0 8px #e81850' }} /></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}><span style={{ fontSize: 9, color: '#e81850', letterSpacing: '0.18em' }}>STEP {stepIndex + 1}/{steps.length}</span><span style={{ fontSize: 9, color: '#ffffff33', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>→ {destName}</span></div>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
-        <div style={{ width: 50, height: 50, flexShrink: 0, background: '#D4537E18', border: '1px solid #D4537E44', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 0 20px #D4537E33', animation: 'stepFadeIn 0.3s ease both' }}>{dir.icon}</div>
-        <div style={{ flex: 1 }}><div style={{ fontSize: 14, color: '#fff', fontWeight: 500, lineHeight: 1.4, animation: 'stepFadeIn 0.3s ease both' }}>{step.instruction}</div>{step.distance && <div style={{ fontSize: 10, color: '#D4537E77', marginTop: 3 }}>{step.distance}</div>}</div>
+        <div style={{ width: 50, height: 50, flexShrink: 0, background: '#e8185018', border: '1px solid #e8185044', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 0 20px #e8185033', animation: 'stepFadeIn 0.3s ease both' }}>{dir.icon}</div>
+        <div style={{ flex: 1 }}><div style={{ fontSize: 14, color: '#fff', fontWeight: 500, lineHeight: 1.4, animation: 'stepFadeIn 0.3s ease both' }}>{step.instruction}</div>{step.distance && <div style={{ fontSize: 10, color: '#e8185077', marginTop: 3 }}>{step.distance}</div>}</div>
       </div>
       {next && <div style={{ padding: '8px 10px', background: '#ffffff04', border: '1px solid #ffffff07', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}><span style={{ fontSize: 9, color: '#ffffff22' }}>THEN</span><span style={{ fontSize: 16, color: '#ffffff55' }}>{ndir?.icon}</span><span style={{ fontSize: 10, color: '#ffffff44', flex: 1, lineHeight: 1.4 }}>{next.instruction}</span></div>}
       <div style={{ display: 'flex', gap: 8 }}>
         {!isFirst && <button onClick={() => setStepIndex(i => i - 1)} style={{ flex: 1, padding: '9px', background: 'transparent', border: '1px solid #ffffff0f', borderRadius: 10, color: '#ffffff55', fontSize: 13, fontFamily: 'inherit', cursor: 'pointer' }}>←</button>}
-        {!isLast ? <button onClick={() => setStepIndex(i => i + 1)} style={{ flex: 3, padding: '10px', background: '#D4537E', border: 'none', borderRadius: 10, color: '#fff', fontSize: 11, letterSpacing: '0.14em', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 0 20px #D4537E44' }}>next step →</button> : <button onClick={onEnd} style={{ flex: 3, padding: '10px', background: '#D4537E', border: 'none', borderRadius: 10, color: '#fff', fontSize: 11, letterSpacing: '0.14em', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>🏁 arrived!</button>}
+        {!isLast ? <button onClick={() => setStepIndex(i => i + 1)} style={{ flex: 3, padding: '10px', background: '#e81850', border: 'none', borderRadius: 10, color: '#fff', fontSize: 11, letterSpacing: '0.14em', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 0 20px #e8185044' }}>next step →</button> : <button onClick={onEnd} style={{ flex: 3, padding: '10px', background: '#e81850', border: 'none', borderRadius: 10, color: '#fff', fontSize: 11, letterSpacing: '0.14em', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>🏁 arrived!</button>}
         <button onClick={onEnd} style={{ padding: '10px 12px', background: 'transparent', border: '1px solid #ffffff0f', borderRadius: 10, color: '#ffffff33', fontSize: 12, fontFamily: 'inherit', cursor: 'pointer' }}>✕</button>
       </div>
     </div>
@@ -505,12 +505,12 @@ function NavOverlay({ steps, stepIndex, setStepIndex, totalDist, totalTime, dest
 function PlaceDrawer({ pin, nearby, dest, routeData, loading, showUnsafe, onToggleUnsafe, onSelectDest, onStartNav, onReset, onChangeDest, placesLoading }) {
   const [open, setOpen] = useState(true); if (!pin) return null;
   return (<div style={{ position: 'absolute', bottom: 72, left: 0, right: 0, zIndex: 900, maxHeight: open ? '50%' : 48, transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1)', display: 'flex', flexDirection: 'column', fontFamily: "'Poppins',sans-serif" }}>
-    <div onClick={() => setOpen(v => !v)} style={{ background: 'rgba(7,7,14,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid #D4537E28', borderRadius: '22px 22px 0 0', padding: '10px 20px 8px', cursor: 'pointer' }}>
+    <div onClick={() => setOpen(v => !v)} style={{ background: 'rgba(7,7,14,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid #e8185028', borderRadius: '22px 22px 0 0', padding: '10px 20px 8px', cursor: 'pointer' }}>
       <div style={{ width: 36, height: 4, borderRadius: 2, background: '#ffffff15', margin: '0 auto 10px' }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div><span style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>Nearby</span><span style={{ fontSize: 11, color: '#ffffff28', marginLeft: 8, fontWeight: 500 }}>{placesLoading ? 'loading...' : dest ? 'route ready' : `${nearby.length} places`}</span></div>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={e => { e.stopPropagation(); onToggleUnsafe(); }} style={{ background: showUnsafe ? '#D4537E10' : 'none', border: `1px solid ${showUnsafe ? '#D4537E30' : '#ffffff08'}`, color: showUnsafe ? '#D4537E' : '#ffffff28', borderRadius: 20, padding: '4px 10px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>⚠</button>
+          <button onClick={e => { e.stopPropagation(); onToggleUnsafe(); }} style={{ background: showUnsafe ? '#e8185010' : 'none', border: `1px solid ${showUnsafe ? '#e8185030' : '#ffffff08'}`, color: showUnsafe ? '#e81850' : '#ffffff28', borderRadius: 20, padding: '4px 10px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>⚠</button>
           <button onClick={e => { e.stopPropagation(); onReset(); }} style={{ background: 'none', border: '1px solid #ffffff08', color: '#ffffff28', borderRadius: 20, padding: '4px 12px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500 }}>Reset</button>
         </div>
       </div>
@@ -533,15 +533,15 @@ function PlaceDrawer({ pin, nearby, dest, routeData, loading, showUnsafe, onTogg
           </div>);
       })
         : <div>
-          <div style={{ background: '#0c0814', border: '1px solid #D4537E20', borderRadius: 16, padding: 14, marginBottom: 10 }}>
-            <div style={{ fontSize: 10, color: '#D4537E', fontWeight: 600, marginBottom: 8, letterSpacing: '0.06em' }}>DESTINATION</div>
+          <div style={{ background: '#0c0814', border: '1px solid #e8185020', borderRadius: 16, padding: 14, marginBottom: 10 }}>
+            <div style={{ fontSize: 10, color: '#e81850', fontWeight: 600, marginBottom: 8, letterSpacing: '0.06em' }}>DESTINATION</div>
             <div style={{ fontSize: 13, color: '#fff', fontWeight: 600, marginBottom: 4 }}>{dest.name}</div>
             <div style={{ fontSize: 11, color: '#ffffff33', fontWeight: 500 }}>{fmDist(dest._dist)} · {fmWalk(dest._dist)}</div>
             {routeData && <div style={{ marginTop: 10, padding: '10px', background: '#ffffff04', borderRadius: 12, display: 'flex', gap: 12 }}>
               {[{ l: 'Distance', v: routeData.totalDist }, { l: 'Walk time', v: routeData.totalTime }, { l: 'Steps', v: routeData.steps.length }].map((x, i, a) => <div key={x.l} style={{ flex: 1, textAlign: 'center', borderRight: i < a.length - 1 ? '1px solid #ffffff08' : 'none' }}><div style={{ fontSize: 9, color: '#ffffff28', fontWeight: 500 }}>{x.l}</div><div style={{ fontSize: 13, color: '#fff', fontWeight: 700, marginTop: 2 }}>{x.v}</div></div>)}
             </div>}
           </div>
-          <button onClick={onStartNav} disabled={loading || !routeData} style={{ width: '100%', padding: 13, background: loading || !routeData ? '#1a0c14' : '#D4537E', border: 'none', borderRadius: 14, color: loading || !routeData ? '#ffffff22' : '#fff', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: loading || !routeData ? 'not-allowed' : 'pointer', marginBottom: 6, boxShadow: !loading && routeData ? '0 0 20px #D4537E33' : 'none' }}>{loading ? '◌ Calculating...' : !routeData ? 'Waiting...' : 'Start Navigation →'}</button>
+          <button onClick={onStartNav} disabled={loading || !routeData} style={{ width: '100%', padding: 13, background: loading || !routeData ? '#1a0c14' : '#e81850', border: 'none', borderRadius: 14, color: loading || !routeData ? '#ffffff22' : '#fff', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: loading || !routeData ? 'not-allowed' : 'pointer', marginBottom: 6, boxShadow: !loading && routeData ? '0 0 20px #e8185033' : 'none' }}>{loading ? '◌ Calculating...' : !routeData ? 'Waiting...' : 'Start Navigation →'}</button>
           <button onClick={onChangeDest} style={{ width: '100%', padding: 9, background: 'transparent', border: '1px solid #ffffff0a', borderRadius: 12, color: '#ffffff28', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>← Change destination</button>
         </div>}
     </div>}
@@ -569,10 +569,10 @@ function LeafletMap({ pin, onMapClick, nearby, safePlaces, dest, routeData, navi
     });
     safePlaces.forEach(p => { const bright = nearbySet.has(p.id), sel = dest?.id === p.id, c = TAG_COLOR[p.tags[0]] || '#888', s = sel ? 18 : bright ? 13 : 7; const m = L.marker([p.lat, p.lng], { icon: L.divIcon({ className: '', html: `<div style="width:${s}px;height:${s}px;background:${sel ? '#fff' : c};border-radius:50%;opacity:${bright || sel ? 1 : 0.18};border:${sel ? `3px solid ${c}` : bright ? '2px solid rgba(255,255,255,.2)' : 'none'};box-shadow:0 0 ${sel ? 14 : bright ? 8 : 2}px ${c}${sel ? 'dd' : bright ? '99' : '22'}"></div>`, iconSize: [s, s], iconAnchor: [s / 2, s / 2] }) }).addTo(map); if (bright || sel) m.bindPopup(`<div style="background:#080d12;color:#fff;padding:7px 11px;border-radius:7px;font-size:12px;font-family:'DM Mono',monospace;line-height:1.5"><span style="color:${c}">${TAG_ICON[p.tags[0]]} ${p.name}</span></div>`, { className: 'st-popup' }); markRef.current.push(m); });
     const cc = navigating && routeData ? routeData.steps.slice(0, stepIndex).flatMap(s => s.coords) : []; const rc = navigating && routeData ? routeData.steps.slice(stepIndex).flatMap(s => s.coords) : (routeData?.allCoords || []);
-    if (cc.length > 1) routeRef.current.push(L.polyline(cc, { color: '#D4537E', weight: 3, opacity: 0.2 }).addTo(map));
-    if (rc.length > 1) { routeRef.current.push(L.polyline(rc, { color: '#D4537E', weight: 10, opacity: 0.08 }).addTo(map)); routeRef.current.push(L.polyline(rc, { color: '#D4537E', weight: 3.5, opacity: 0.92, dashArray: navigating ? '10,6' : undefined }).addTo(map)); }
-    if (pin && !navigating) { const m = L.marker([pin.lat, pin.lng], { icon: L.divIcon({ className: '', html: `<div style="position:relative;width:22px;height:22px"><div style="width:22px;height:22px;background:#D4537E;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px #D4537E40,0 0 20px #D4537E99"></div><div style="position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);width:2px;height:13px;background:linear-gradient(#D4537E,transparent)"></div></div>`, iconSize: [22, 35], iconAnchor: [11, 35] }) }).addTo(map); m.bindPopup(`<div style="background:#0d060a;color:#D4537E;padding:6px 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace">you are here</div>`, { className: 'st-popup' }); markRef.current.push(m); }
-    if (dest && !navigating) markRef.current.push(L.marker([dest.lat, dest.lng], { icon: L.divIcon({ className: '', html: `<div style="width:16px;height:16px;background:#fff;border:3px solid #D4537E;border-radius:50%;box-shadow:0 0 14px #D4537E88"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] }) }).addTo(map));
+    if (cc.length > 1) routeRef.current.push(L.polyline(cc, { color: '#e81850', weight: 3, opacity: 0.2 }).addTo(map));
+    if (rc.length > 1) { routeRef.current.push(L.polyline(rc, { color: '#e81850', weight: 10, opacity: 0.08 }).addTo(map)); routeRef.current.push(L.polyline(rc, { color: '#e81850', weight: 3.5, opacity: 0.92, dashArray: navigating ? '10,6' : undefined }).addTo(map)); }
+    if (pin && !navigating) { const m = L.marker([pin.lat, pin.lng], { icon: L.divIcon({ className: '', html: `<div style="position:relative;width:22px;height:22px"><div style="width:22px;height:22px;background:#e81850;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px #e8185040,0 0 20px #e8185099"></div><div style="position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);width:2px;height:13px;background:linear-gradient(#e81850,transparent)"></div></div>`, iconSize: [22, 35], iconAnchor: [11, 35] }) }).addTo(map); m.bindPopup(`<div style="background:#0d060a;color:#e81850;padding:6px 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace">you are here</div>`, { className: 'st-popup' }); markRef.current.push(m); }
+    if (dest && !navigating) markRef.current.push(L.marker([dest.lat, dest.lng], { icon: L.divIcon({ className: '', html: `<div style="width:16px;height:16px;background:#fff;border:3px solid #e81850;border-radius:50%;box-shadow:0 0 14px #e8185088"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] }) }).addTo(map));
     if (dest && pin && !navigating) map.flyTo([(pin.lat + dest.lat) / 2, (pin.lng + dest.lng) / 2], 15, { duration: 1 });
     if (navigating && routeData?.steps?.[stepIndex]?.coords?.length) { const coords = routeData.steps[stepIndex].coords; const nm = L.marker(coords[0], { icon: L.divIcon({ className: '', html: `<div class="nav-dot-outer"><div class="nav-dot-inner"></div></div>`, iconSize: [24, 24], iconAnchor: [12, 12] }) }).addTo(map); navDotRef.current = nm; let idx = 0; navTimerRef.current = setInterval(() => { if (idx >= coords.length) { clearInterval(navTimerRef.current); return; } nm.setLatLng(coords[idx]); map.panTo(coords[idx], { animate: true, duration: 0.15 }); idx++; }, 80); }
   }, [pin, nearby, safePlaces, dest, routeData, navigating, stepIndex, showUnsafe, unsafeZones]);
@@ -583,15 +583,15 @@ function LeafletMap({ pin, onMapClick, nearby, safePlaces, dest, routeData, navi
 function BottomNav({ activeTab, onMap, onComplaint, onTrack }) {
   return (
     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 950, height: 68, background: 'rgba(7,7,14,0.97)', borderTop: '1px solid #ffffff06', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 24px', fontFamily: "'Poppins',sans-serif" }}>
-      <button onClick={onMap} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'map' ? '#D4537E' : '#ffffff28', transition: 'color 0.2s', flex: 1 }}>
+      <button onClick={onMap} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'map' ? '#e81850' : '#ffffff28', transition: 'color 0.2s', flex: 1 }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
         <span style={{ fontSize: 9, fontWeight: 600 }}>Map</span>
       </button>
-      <button onClick={onComplaint} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'complaint' ? '#D4537E' : '#ffffff28', transition: 'color 0.2s', flex: 1 }}>
+      <button onClick={onComplaint} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'complaint' ? '#e81850' : '#ffffff28', transition: 'color 0.2s', flex: 1 }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="8" y1="16" x2="12" y2="16" /></svg>
         <span style={{ fontSize: 9, fontWeight: 600 }}>Report</span>
       </button>
-      <button onClick={onTrack} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'track' ? '#D4537E' : '#ffffff28', transition: 'color 0.2s', flex: 1 }}>
+      <button onClick={onTrack} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'track' ? '#e81850' : '#ffffff28', transition: 'color 0.2s', flex: 1 }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
         <span style={{ fontSize: 9, fontWeight: 600 }}>Track</span>
       </button>
@@ -614,13 +614,13 @@ function LandingPage({ onEnter }) {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: isSent ? '#040e08' : isRed ? '#12060a' : '#000000', fontFamily: "'Poppins',sans-serif", animation: 'fadeIn 0.5s ease', position: 'relative', transition: 'background 0.6s' }}>
       {/* Subtle dot grid */}
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(#D4537E 1px, transparent 1px)', backgroundSize: '32px 32px', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(#e81850 1px, transparent 1px)', backgroundSize: '32px 32px', pointerEvents: 'none' }} />
 
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/* Title */}
         <div style={{ marginBottom: 40, opacity: isRed || isSent ? 0.4 : 1, transition: 'opacity 0.4s' }}>
           <span style={{ fontSize: 30, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>SAFE</span>
-          <span style={{ fontSize: 30, fontWeight: 900, color: '#CE2029', letterSpacing: '-0.02em' }}>TRACE</span>
+          <span style={{ fontSize: 30, fontWeight: 900, color: '#e81850', letterSpacing: '-0.02em' }}>TRACE</span>
         </div>
 
         {/* SOS Button */}
@@ -662,9 +662,9 @@ function LandingPage({ onEnter }) {
         <button onClick={onEnter} style={{
           padding: '14px 44px',
           background: isRed || isSent ? 'rgba(255,255,255,0.06)' : 'transparent',
-          border: `1px solid ${isRed ? '#ffffff15' : isSent ? '#34d39933' : '#D4537E33'}`,
+          border: `1px solid ${isRed ? '#ffffff15' : isSent ? '#34d39933' : '#e8185033'}`,
           borderRadius: 50,
-          color: isRed ? '#ffffff55' : isSent ? '#34d399' : '#D4537E',
+          color: isRed ? '#ffffff55' : isSent ? '#34d399' : '#e81850',
           fontSize: 12, fontWeight: 700, letterSpacing: '0.15em',
           fontFamily: "'Poppins',sans-serif", cursor: 'pointer',
           transition: 'all 0.3s',
@@ -701,7 +701,7 @@ function ArrivalCheckIn({ destName, onSafe, onNeedHelp }) {
         <div style={{ width: 40, height: 4, borderRadius: 2, background: '#ffffff15', marginBottom: 20 }} />
 
         {state === 'ask' && <>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#D4537E12', border: '2px solid #D4537E44', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, marginBottom: 16 }}>🏁</div>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#e8185012', border: '2px solid #e8185044', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, marginBottom: 16 }}>🏁</div>
           <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 4 }}>You've Arrived</div>
           <div style={{ fontSize: 12, color: '#ffffff33', marginBottom: 6, textAlign: 'center' }}>{destName}</div>
           <div style={{ fontSize: 14, fontWeight: 600, color: '#ffffff88', marginBottom: 28, textAlign: 'center' }}>Are you okay? Do you need help?</div>
@@ -709,7 +709,7 @@ function ArrivalCheckIn({ destName, onSafe, onNeedHelp }) {
             <button onClick={handleSafe} style={{ flex: 1, padding: '16px', background: '#34d399', border: 'none', borderRadius: 16, color: '#fff', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', boxShadow: '0 0 24px #34d39933' }}>
               I'm Safe ✓
             </button>
-            <button onClick={handleHelp} style={{ flex: 1, padding: '16px', background: '#D4537E', border: 'none', borderRadius: 16, color: '#fff', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', boxShadow: '0 0 24px #D4537E33' }}>
+            <button onClick={handleHelp} style={{ flex: 1, padding: '16px', background: '#e81850', border: 'none', borderRadius: 16, color: '#fff', fontSize: 14, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', boxShadow: '0 0 24px #e8185033' }}>
               Need Help
             </button>
           </div>
@@ -737,28 +737,28 @@ function ArrivalCheckIn({ destName, onSafe, onNeedHelp }) {
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <a href="tel:100" style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px',
-              background: '#0d0d14', border: '1px solid #D4537E33', borderRadius: 16,
+              background: '#0d0d14', border: '1px solid #e8185033', borderRadius: 16,
               textDecoration: 'none', cursor: 'pointer', transition: 'border-color 0.2s',
             }}>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#D4537E15', border: '1px solid #D4537E33', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🚔</div>
+              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#e8185015', border: '1px solid #e8185033', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🚔</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Call Police</div>
                 <div style={{ fontSize: 11, color: '#ffffff33', marginTop: 1 }}>Emergency Helpline 100</div>
               </div>
-              <div style={{ fontSize: 16, color: '#D4537E' }}>→</div>
+              <div style={{ fontSize: 16, color: '#e81850' }}>→</div>
             </a>
 
             <a href="tel:1091" style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px',
-              background: '#0d0d14', border: '1px solid #D4537E33', borderRadius: 16,
+              background: '#0d0d14', border: '1px solid #e8185033', borderRadius: 16,
               textDecoration: 'none', cursor: 'pointer', transition: 'border-color 0.2s',
             }}>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#D4537E12', border: '1px solid #D4537E33', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📞</div>
+              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#e8185012', border: '1px solid #e8185033', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📞</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Women Helpline</div>
                 <div style={{ fontSize: 11, color: '#ffffff33', marginTop: 1 }}>Dial 1091</div>
               </div>
-              <div style={{ fontSize: 16, color: '#D4537E' }}>→</div>
+              <div style={{ fontSize: 16, color: '#e81850' }}>→</div>
             </a>
 
             <a href="tel:112" style={{
@@ -799,7 +799,7 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
     'under review': { label: 'Under Review', color: '#38bdf8', dot: '#38bdf8', bg: '#38bdf808', border: '#38bdf822' },
     'investigating': { label: 'Investigating', color: '#fbbf24', dot: '#fbbf24', bg: '#fbbf2408', border: '#fbbf2422' },
     'resolved': { label: 'Resolved', color: '#34d399', dot: '#34d399', bg: '#34d39908', border: '#34d39922' },
-    'rejected': { label: 'Rejected', color: '#D4537E', dot: '#D4537E', bg: '#D4537E08', border: '#D4537E22' },
+    'rejected': { label: 'Rejected', color: '#e81850', dot: '#e81850', bg: '#e8185008', border: '#e8185022' },
     'closed': { label: 'Closed', color: '#ffffff55', dot: '#ffffff44', bg: '#ffffff05', border: '#ffffff12' },
   };
   const getStatus = s => { const k = (s || '').toLowerCase().trim(); return STATUS_CONFIG[k] || { label: s || 'Under Review', color: '#38bdf8', dot: '#38bdf8', bg: '#38bdf808', border: '#38bdf822' }; };
@@ -896,7 +896,7 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
           <button
             onClick={handleSearch}
             disabled={!inputId.trim() || loading}
-            style={{ marginTop: 12, width: '100%', padding: '13px', background: inputId.trim() && !loading ? '#D4537E' : '#1a0c14', border: 'none', borderRadius: 14, color: inputId.trim() && !loading ? '#fff' : '#ffffff1a', fontSize: 13, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: inputId.trim() && !loading ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: inputId.trim() && !loading ? '0 0 24px #D4537E33' : 'none', transition: 'all 0.2s' }}
+            style={{ marginTop: 12, width: '100%', padding: '13px', background: inputId.trim() && !loading ? '#e81850' : '#1a0c14', border: 'none', borderRadius: 14, color: inputId.trim() && !loading ? '#fff' : '#ffffff1a', fontSize: 13, fontWeight: 700, fontFamily: "'Poppins',sans-serif", cursor: inputId.trim() && !loading ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: inputId.trim() && !loading ? '0 0 24px #e8185033' : 'none', transition: 'all 0.2s' }}
           >
             {loading
               ? <><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>Looking up...</>
@@ -915,7 +915,7 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div>
                   <div style={{ fontSize: 9, color: '#ffffff33', fontWeight: 600, letterSpacing: '0.12em', marginBottom: 4 }}>CASE ID</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: '#D4537E', fontFamily: "'DM Mono',monospace", letterSpacing: '0.06em' }}>{caseData.case_id}</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#e81850', fontFamily: "'DM Mono',monospace", letterSpacing: '0.06em' }}>{caseData.case_id}</div>
                 </div>
                 <button onClick={handleCopy} style={{ background: copied ? '#34d39915' : '#ffffff08', border: `1px solid ${copied ? '#34d39944' : '#ffffff0c'}`, borderRadius: 10, padding: '8px 12px', color: copied ? '#34d399' : '#ffffff55', fontSize: 11, fontWeight: 600, fontFamily: "'Poppins',sans-serif", cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, transition: 'all 0.2s' }}>{copied ? '✓ Copied' : 'Copy'}</button>
               </div>
@@ -943,9 +943,9 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
 
         {/* Not found */}
         {!loading && activeId && caseData === false && (
-          <div style={{ animation: 'fadeUp 0.3s ease', background: '#0d0d14', border: '1px solid #D4537E22', borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
+          <div style={{ animation: 'fadeUp 0.3s ease', background: '#0d0d14', border: '1px solid #e8185022', borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: 28, marginBottom: 10 }}>🔍</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#D4537E', marginBottom: 6 }}>{fetchError ? 'Connection Error' : 'Case Not Found'}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#e81850', marginBottom: 6 }}>{fetchError ? 'Connection Error' : 'Case Not Found'}</div>
             <div style={{ fontSize: 11, color: '#ffffff28', lineHeight: 1.6 }}>{fetchError || "No record found. Double-check the Case ID — it's case-sensitive."}</div>
           </div>
         )}
@@ -990,7 +990,7 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim }) {
       {/* Header */}
       {!navigating && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 800, padding: '14px 20px 10px', paddingRight: '72px', background: 'linear-gradient(180deg,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.7) 60%,transparent 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: "'Poppins',sans-serif" }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>Safe</span><span style={{ fontSize: 18, fontWeight: 800, color: '#D4537E', letterSpacing: '-0.01em' }}>Trace</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>Safe</span><span style={{ fontSize: 18, fontWeight: 800, color: '#e81850', letterSpacing: '-0.01em' }}>Trace</span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {(dataStatus.places === 'live' || dataStatus.news === 'live') && !newsLoading && !placesLoading && <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#ffffff08', borderRadius: 20, padding: '4px 10px' }}>
@@ -1011,7 +1011,7 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim }) {
           <div style={{ display: 'flex', gap: 8 }}>
             {[
               { icon: '🛡️', value: `${safeCount}`, sub: 'Safe spots in 15km', color: '#34d399' },
-              { icon: '⚠️', value: `${riskTotal}`, sub: `${riskHigh} high risk in 15km`, color: '#D4537E' },
+              { icon: '⚠️', value: `${riskTotal}`, sub: `${riskHigh} high risk in 15km`, color: '#e81850' },
               { icon: '📡', value: 'Live', sub: 'Monitoring active', color: '#38bdf8' },
             ].map((card, i) => (
               <div key={i} style={{
@@ -1032,13 +1032,13 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim }) {
       )}
 
       {/* Loading route */}
-      {loading && <div style={{ position: 'absolute', bottom: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 800, background: 'rgba(7,7,14,0.92)', border: '1px solid #D4537E33', color: '#D4537E', padding: '10px 24px', borderRadius: 24, fontSize: 12, backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Poppins',sans-serif", fontWeight: 500 }}><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>Calculating route...</div>}
+      {loading && <div style={{ position: 'absolute', bottom: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 800, background: 'rgba(7,7,14,0.92)', border: '1px solid #e8185033', color: '#e81850', padding: '10px 24px', borderRadius: 24, fontSize: 12, backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Poppins',sans-serif", fontWeight: 500 }}><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>Calculating route...</div>}
 
       {/* Data loading */}
       {(newsLoading || placesLoading) && <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 800, background: 'rgba(7,7,14,0.92)', border: '1px solid #38bdf822', color: '#38bdf8', padding: '6px 18px', borderRadius: 20, fontSize: 10, backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Poppins',sans-serif", fontWeight: 500 }}><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>{newsLoading && placesLoading ? 'Loading live data...' : newsLoading ? 'Fetching news...' : 'Fetching places...'}</div>}
 
       {/* Risk legend */}
-      {showUnsafe && !navigating && pin && <div style={{ position: 'absolute', bottom: 84, right: 10, zIndex: 800, background: 'rgba(7,7,14,0.88)', border: '1px solid #ffffff08', borderRadius: 14, padding: '8px 12px', backdropFilter: 'blur(12px)', fontFamily: "'DM Mono',monospace", fontSize: 8, letterSpacing: '0.08em' }}>{[{ l: 'HIGH', c: '#D4537E' }, { l: 'MED', c: '#ff9500' }, { l: 'LOW', c: '#ffcc00' }].map(r => <div key={r.l} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: r.c, boxShadow: `0 0 4px ${r.c}` }} /><span style={{ color: r.c, fontSize: 8 }}>{r.l}</span></div>)}</div>}
+      {showUnsafe && !navigating && pin && <div style={{ position: 'absolute', bottom: 84, right: 10, zIndex: 800, background: 'rgba(7,7,14,0.88)', border: '1px solid #ffffff08', borderRadius: 14, padding: '8px 12px', backdropFilter: 'blur(12px)', fontFamily: "'DM Mono',monospace", fontSize: 8, letterSpacing: '0.08em' }}>{[{ l: 'HIGH', c: '#e81850' }, { l: 'MED', c: '#ff9500' }, { l: 'LOW', c: '#ffcc00' }].map(r => <div key={r.l} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: r.c, boxShadow: `0 0 4px ${r.c}` }} /><span style={{ color: r.c, fontSize: 8 }}>{r.l}</span></div>)}</div>}
 
       {/* Place drawer */}
       {!navigating && <PlaceDrawer pin={pin} nearby={nearby} dest={dest} routeData={routeData} loading={loading} showUnsafe={showUnsafe} onToggleUnsafe={() => setShowUnsafe(v => !v)} onSelectDest={handleSelectDest} onStartNav={handleStartNav} onReset={handleReset} onChangeDest={handleChangeDest} placesLoading={placesLoading} />}

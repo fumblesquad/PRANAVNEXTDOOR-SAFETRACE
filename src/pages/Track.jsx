@@ -13,11 +13,11 @@ const STATUS_LABELS = {
 };
 
 const TYPE_COLORS = {
-  harassment: '#D4537E',
+  harassment: '#e81850',
   theft: '#ff6b35',
   'unsafe area': '#ffd60a',
   'poor lighting': '#8338ec',
-  stalking: '#D4537E',
+  stalking: '#e81850',
   sos: '#cc0000',
   other: '#aaa',
 };
@@ -181,10 +181,10 @@ export default function Track() {
                   onClick={() => handleSavedClick(id)}
                   style={{
                     padding: '5px 12px',
-                    background: caseInput === id ? 'rgba(212,83,126,0.1)' : '#111',
-                    border: `1px solid ${caseInput === id ? '#D4537E' : '#222'}`,
+                    background: caseInput === id ? 'rgba(232,24,80,0.1)' : '#111',
+                    border: `1px solid ${caseInput === id ? '#e81850' : '#222'}`,
                     borderRadius: '6px',
-                    color: caseInput === id ? '#D4537E' : '#555',
+                    color: caseInput === id ? '#e81850' : '#555',
                     fontSize: '12px',
                     fontFamily: 'monospace',
                     cursor: 'pointer',
@@ -215,7 +215,7 @@ export default function Track() {
             disabled={loading || fetching}
             style={{
               padding: '12px 22px',
-              background: (loading || fetching) ? '#7a2f4a' : '#D4537E',
+              background: (loading || fetching) ? '#7a2f4a' : '#e81850',
               border: 'none', borderRadius: '8px',
               color: '#fff', fontSize: '14px', fontWeight: 600,
               cursor: (loading || fetching) ? 'not-allowed' : 'pointer',
@@ -227,7 +227,7 @@ export default function Track() {
         </form>
 
         {error && (
-          <p style={{ color: '#D4537E', fontSize: '14px', marginBottom: '20px' }}>{error}</p>
+          <p style={{ color: '#e81850', fontSize: '14px', marginBottom: '20px' }}>{error}</p>
         )}
 
         {/* Report card */}
@@ -249,11 +249,11 @@ export default function Track() {
               {isOwner && (
                 <span style={{
                   fontSize: '11px',
-                  color: '#D4537E',
-                  border: '1px solid rgba(212,83,126,0.35)',
+                  color: '#e81850',
+                  border: '1px solid rgba(232,24,80,0.35)',
                   padding: '4px 10px',
                   borderRadius: '20px',
-                  background: 'rgba(212,83,126,0.07)',
+                  background: 'rgba(232,24,80,0.07)',
                   whiteSpace: 'nowrap',
                 }}>
                   This is your report
@@ -312,7 +312,7 @@ export default function Track() {
                           position: 'absolute',
                           left: '-50%', top: '9px',
                           width: '100%', height: '2px',
-                          background: (done || active) ? '#D4537E' : '#1e1e1e',
+                          background: (done || active) ? '#e81850' : '#1e1e1e',
                         }} />
                       )}
 
@@ -325,20 +325,20 @@ export default function Track() {
                               position: 'absolute',
                               inset: '-4px',
                               borderRadius: '50%',
-                              background: 'rgba(212,83,126,0.4)',
+                              background: 'rgba(232,24,80,0.4)',
                               animation: 'trackPulse 1.6s ease-in-out infinite',
                             }} />
                             <div style={{
                               width: '20px', height: '20px', borderRadius: '50%',
-                              background: '#D4537E',
+                              background: '#e81850',
                               position: 'relative', zIndex: 1,
                             }} />
                           </div>
                         ) : (
                           <div style={{
                             width: '20px', height: '20px', borderRadius: '50%',
-                            background: done ? '#D4537E' : '#0a0a0a',
-                            border: `2px solid ${done ? '#D4537E' : '#222'}`,
+                            background: done ? '#e81850' : '#0a0a0a',
+                            border: `2px solid ${done ? '#e81850' : '#222'}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}>
                             {done && (
@@ -356,7 +356,7 @@ export default function Track() {
                         fontSize: '10px',
                         textAlign: 'center',
                         lineHeight: 1.3,
-                        color: active ? '#D4537E' : done ? '#666' : '#222',
+                        color: active ? '#e81850' : done ? '#666' : '#222',
                         fontWeight: active ? 600 : 400,
                       }}>
                         {STATUS_LABELS[step]}

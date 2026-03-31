@@ -120,8 +120,8 @@ export default function Home() {
               key={id}
               onClick={() => handleTypeSelect(id)}
               style={{
-                background: selected === id ? '#D4537E' : '#111',
-                border: selected === id ? '1px solid #D4537E' : '1px solid #1e1e1e',
+                background: selected === id ? '#e81850' : '#111',
+                border: selected === id ? '1px solid #e81850' : '1px solid #1e1e1e',
                 borderRadius: '8px',
                 padding: '16px 14px',
                 color: selected === id ? '#fff' : '#999',

@@ -14,11 +14,11 @@ const RISK_ZONES = [
 ];
 
 const TYPE_COLORS = {
-  harassment: '#D4537E',
+  harassment: '#e81850',
   theft: '#ff6b35',
   'unsafe area': '#ffd60a',
   'poor lighting': '#8338ec',
-  stalking: '#D4537E',
+  stalking: '#e81850',
   sos: '#cc0000',
   other: '#aaa',
 };
@@ -93,9 +93,9 @@ export default function FullMap() {
             style={{
               padding: '5px 12px',
               borderRadius: '16px',
-              border: filter === t ? '1px solid #D4537E' : '1px solid #2a2a2a',
-              background: filter === t ? 'rgba(212,83,126,0.14)' : 'transparent',
-              color: filter === t ? '#D4537E' : '#555',
+              border: filter === t ? '1px solid #e81850' : '1px solid #2a2a2a',
+              background: filter === t ? 'rgba(232,24,80,0.14)' : 'transparent',
+              color: filter === t ? '#e81850' : '#555',
               fontSize: '12px',
               cursor: 'pointer',
               textTransform: 'capitalize',

@@ -192,7 +192,7 @@ export default function ReportTab() {
           onClick={resetForm}
           style={{
             width: '100%', padding: '12px',
-            background: '#D4537E',
+            background: '#e81850',
             border: 'none',
             borderRadius: '8px', color: '#fff',
             fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
@@ -227,10 +227,10 @@ export default function ReportTab() {
             onClick={() => setSelectedType(id)}
             style={{
               padding: '16px 12px',
-              background: selectedType === id ? 'rgba(212,83,126,0.15)' : '#111',
-              border: selectedType === id ? '1px solid #D4537E' : '1px solid #1e1e1e',
+              background: selectedType === id ? 'rgba(232,24,80,0.15)' : '#111',
+              border: selectedType === id ? '1px solid #e81850' : '1px solid #1e1e1e',
               borderRadius: '10px',
-              color: selectedType === id ? '#D4537E' : '#888',
+              color: selectedType === id ? '#e81850' : '#888',
               fontSize: '13px',
               fontWeight: selectedType === id ? 600 : 400,
               cursor: 'pointer',
@@ -379,14 +379,14 @@ export default function ReportTab() {
             )}
           </div>
 
-          {error && <p style={{ color: '#D4537E', fontSize: '13px', margin: 0 }}>{error}</p>}
+          {error && <p style={{ color: '#e81850', fontSize: '13px', margin: 0 }}>{error}</p>}
 
           <button
             onClick={handleSubmit}
             disabled={submitting}
             style={{
               padding: '14px',
-              background: submitting ? '#7a2f4a' : '#D4537E',
+              background: submitting ? '#7a2f4a' : '#e81850',
               border: 'none',
               borderRadius: '8px',
               color: '#fff',

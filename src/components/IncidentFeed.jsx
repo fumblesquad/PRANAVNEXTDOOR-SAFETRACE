@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { getRecentReports } from '../services/dbService';
 
 const TYPE_COLORS = {
-  harassment: '#D4537E',
+  harassment: '#e81850',
   theft: '#ff6b35',
   'unsafe area': '#ffd60a',
   'poor lighting': '#8338ec',
-  stalking: '#D4537E',
+  stalking: '#e81850',
   SOS: '#cc0000',
   other: '#aaa',
 };

@@ -117,7 +117,7 @@ export default function SOS() {
         textAlign: 'center'
       }}>
         <span style={{ fontSize: '28px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px' }}>
-          Safe<span style={{ color: '#CE2029' }}>Trace</span>
+          Safe<span style={{ color: '#e81850' }}>Trace</span>
         </span>
       </div>
 

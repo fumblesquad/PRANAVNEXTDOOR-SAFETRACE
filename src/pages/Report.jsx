@@ -232,7 +232,7 @@ export default function Report() {
               onClick={() => navigate(`/track?caseId=${caseId}`)}
               style={{
                 flex: 1, padding: '12px',
-                background: '#D4537E', border: 'none',
+                background: '#e81850', border: 'none',
                 borderRadius: '8px', color: '#fff',
                 fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
               }}
@@ -254,7 +254,7 @@ export default function Report() {
 
           {!user && (
             <p style={{ color: '#444', fontSize: '13px', borderTop: '1px solid #1a1a1a', paddingTop: '16px' }}>
-              <a href="/signin" style={{ color: '#D4537E', textDecoration: 'none' }}>Sign in</a>
+              <a href="/signin" style={{ color: '#e81850', textDecoration: 'none' }}>Sign in</a>
               {' '}to track this report's status.
             </p>
           )}
@@ -286,9 +286,9 @@ export default function Report() {
                   style={{
                     padding: '8px 16px',
                     borderRadius: '20px',
-                    border: type === t ? '1px solid #D4537E' : '1px solid #2a2a2a',
-                    background: type === t ? 'rgba(212,83,126,0.14)' : '#111',
-                    color: type === t ? '#D4537E' : '#777',
+                    border: type === t ? '1px solid #e81850' : '1px solid #2a2a2a',
+                    background: type === t ? 'rgba(232,24,80,0.14)' : '#111',
+                    color: type === t ? '#e81850' : '#777',
                     fontSize: '13px',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
@@ -426,14 +426,14 @@ export default function Report() {
             )}
           </div>
 
-          {error && <p style={{ color: '#D4537E', fontSize: '13px', margin: 0 }}>{error}</p>}
+          {error && <p style={{ color: '#e81850', fontSize: '13px', margin: 0 }}>{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
             style={{
               padding: '14px',
-              background: '#D4537E',
+              background: '#e81850',
               border: 'none',
               borderRadius: '8px',
               color: '#fff',

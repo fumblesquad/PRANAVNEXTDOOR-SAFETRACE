@@ -10,11 +10,11 @@ const RISK_COLORS = {
 };
 
 const TYPE_COLORS = {
-  harassment: '#D4537E',
+  harassment: '#e81850',
   theft: '#ff6b35',
   'unsafe area': '#ffd60a',
   'poor lighting': '#8338ec',
-  stalking: '#D4537E',
+  stalking: '#e81850',
   sos: '#cc0000',
   other: '#aaa',
 };
@@ -156,14 +156,14 @@ export default function MapTab({ onSOS }) {
           width: '44px',
           height: '44px',
           borderRadius: '50%',
-          background: '#D4537E',
+          background: '#e81850',
           border: 'none',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          boxShadow: '0 2px 10px rgba(212,83,126,0.4)',
+          boxShadow: '0 2px 10px rgba(232,24,80,0.4)',
         }}
       >
         <span style={{ color: '#fff', fontSize: '12px', fontWeight: 700 }}>SOS</span>
@@ -208,14 +208,14 @@ export default function MapTab({ onSOS }) {
               <RiskPill color="#2ecc71" label="Low" count={riskCounts.low} />
               <div style={{
                 padding: '8px 14px',
-                background: 'rgba(212,83,126,0.1)',
-                border: '1px solid rgba(212,83,126,0.3)',
+                background: 'rgba(232,24,80,0.1)',
+                border: '1px solid rgba(232,24,80,0.3)',
                 borderRadius: '20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
               }}>
-                <span style={{ color: '#D4537E', fontSize: '12px' }}>
+                <span style={{ color: '#e81850', fontSize: '12px' }}>
                   {reports.length} reports
                 </span>
               </div>

@@ -49,16 +49,16 @@ export default function SOSButton() {
         width: '120px',
         height: '120px',
         borderRadius: '50%',
-        background: triggered ? '#8b0000' : '#D4537E',
-        border: '4px solid rgba(212, 83, 126, 0.3)',
+        background: triggered ? '#8b0000' : '#e81850',
+        border: '4px solid rgba(232,24,80, 0.3)',
         color: '#fff',
         fontSize: '22px',
         fontWeight: 800,
         letterSpacing: '2px',
         cursor: triggered ? 'default' : 'pointer',
         boxShadow: triggered
-          ? '0 0 40px rgba(212, 83, 126, 0.8), 0 0 80px rgba(212, 83, 126, 0.4)'
-          : '0 0 20px rgba(212, 83, 126, 0.4)',
+          ? '0 0 40px rgba(232,24,80, 0.8), 0 0 80px rgba(232,24,80, 0.4)'
+          : '0 0 20px rgba(232,24,80, 0.4)',
         transition: 'all 0.2s',
         animation: triggered ? 'sosPulse 0.5s ease-in-out infinite' : 'sosGlow 2s ease-in-out infinite',
         display: 'flex',

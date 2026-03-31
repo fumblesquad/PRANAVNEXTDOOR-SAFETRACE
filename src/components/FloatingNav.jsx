@@ -1,7 +1,7 @@
 // SVG icons for nav items
 function HomeIcon({ active }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#D4537E' : '#555'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#e81850' : '#555'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
       <path d="M9 21V12h6v9"/>
     </svg>
@@ -10,7 +10,7 @@ function HomeIcon({ active }) {
 
 function MapIcon({ active }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#D4537E' : '#555'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#e81850' : '#555'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="3"/>
       <line x1="12" y1="3" x2="12" y2="6"/>
       <line x1="12" y1="18" x2="12" y2="21"/>
@@ -22,7 +22,7 @@ function MapIcon({ active }) {
 
 function ReportIcon({ active }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#D4537E' : '#555'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#e81850' : '#555'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
     </svg>
   );
@@ -65,8 +65,8 @@ export default function FloatingNav({ activePage, onNavigate }) {
               height: '36px',
               borderRadius: '9999px',
               border: 'none',
-              background: active ? 'rgba(212,83,126,0.14)' : 'none',
-              color: active ? '#D4537E' : '#555',
+              background: active ? 'rgba(232,24,80,0.14)' : 'none',
+              color: active ? '#e81850' : '#555',
               display: 'flex',
               alignItems: 'center',
               gap: '7px',
@@ -83,7 +83,7 @@ export default function FloatingNav({ activePage, onNavigate }) {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                background: '#D4537E',
+                background: '#e81850',
                 flexShrink: 0,
               }} />
             )}

@@ -116,10 +116,10 @@ export default function ProfileTab() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               width: '40px', height: '40px', borderRadius: '50%',
-              background: 'rgba(212,83,126,0.15)',
+              background: 'rgba(232,24,80,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4537E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e81850" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
               </svg>
@@ -349,13 +349,13 @@ export default function ProfileTab() {
               required
               style={inputStyle}
             />
-            {error && <p style={{ color: '#D4537E', fontSize: '12px', margin: 0 }}>{error}</p>}
+            {error && <p style={{ color: '#e81850', fontSize: '12px', margin: 0 }}>{error}</p>}
             <button
               type="submit"
               disabled={loading}
               style={{
                 padding: '12px',
-                background: loading ? '#7a2f4a' : '#D4537E',
+                background: loading ? '#7a2f4a' : '#e81850',
                 border: 'none',
                 borderRadius: '8px',
                 color: '#fff',

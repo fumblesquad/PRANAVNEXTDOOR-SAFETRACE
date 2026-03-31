@@ -81,9 +81,9 @@ export default function SignIn() {
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>
           <svg width="34" height="34" viewBox="0 0 34 34" fill="none" style={{ marginBottom: '10px' }}>
             <path d="M17 3L5 8v10c0 7.18 5.82 13 12 13s12-5.82 12-13V8L17 3z"
-              fill="none" stroke="#D4537E" strokeWidth="2" strokeLinejoin="round"/>
+              fill="none" stroke="#e81850" strokeWidth="2" strokeLinejoin="round"/>
             <path d="M12 17l3.5 3.5L22 14"
-              stroke="#D4537E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              stroke="#e81850" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <p style={{ color: '#fff', fontSize: '18px', fontWeight: 700, margin: 0 }}>SafeTrace</p>
         </div>
@@ -195,7 +195,7 @@ export default function SignIn() {
             />
 
             {error && (
-              <p style={{ color: '#D4537E', fontSize: '13px', margin: '2px 0 0' }}>{error}</p>
+              <p style={{ color: '#e81850', fontSize: '13px', margin: '2px 0 0' }}>{error}</p>
             )}
 
             <button
@@ -203,7 +203,7 @@ export default function SignIn() {
               disabled={loading}
               style={{
                 padding: '12px',
-                background: loading ? '#7a2f4a' : '#D4537E',
+                background: loading ? '#7a2f4a' : '#e81850',
                 border: 'none',
                 borderRadius: '8px',
                 color: '#fff',

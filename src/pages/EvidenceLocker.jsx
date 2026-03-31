@@ -88,15 +88,15 @@ function AuthGate() {
         <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required style={inputStyle} />
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required style={inputStyle} />
-          {error && <p style={{ color: '#D4537E', fontSize: '13px', margin: 0 }}>{error}</p>}
-          <button type="submit" disabled={loading} style={{ padding: '12px', background: '#D4537E', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', fontFamily: 'inherit' }}>
+          {error && <p style={{ color: '#e81850', fontSize: '13px', margin: 0 }}>{error}</p>}
+          <button type="submit" disabled={loading} style={{ padding: '12px', background: '#e81850', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', fontFamily: 'inherit' }}>
             {loading ? 'Please wait...' : isRegister ? 'Create account' : 'Sign in'}
           </button>
         </form>
 
         <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '13px', color: '#444' }}>
           {isRegister ? 'Have an account?' : 'No account?'}{' '}
-          <button onClick={() => { setIsRegister(!isRegister); setError(''); }} style={{ background: 'none', border: 'none', color: '#D4537E', cursor: 'pointer', fontSize: '13px', padding: 0, fontFamily: 'inherit' }}>
+          <button onClick={() => { setIsRegister(!isRegister); setError(''); }} style={{ background: 'none', border: 'none', color: '#e81850', cursor: 'pointer', fontSize: '13px', padding: 0, fontFamily: 'inherit' }}>
             {isRegister ? 'Sign in' : 'Register'}
           </button>
         </p>
@@ -213,7 +213,7 @@ export default function EvidenceLocker() {
             </p>
             <button
               onClick={() => navigate('/')}
-              style={{ padding: '10px 24px', background: '#D4537E', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', cursor: 'pointer', fontFamily: 'inherit' }}
+              style={{ padding: '10px 24px', background: '#e81850', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', cursor: 'pointer', fontFamily: 'inherit' }}
             >
               File a report
             </button>
@@ -225,7 +225,7 @@ export default function EvidenceLocker() {
                 key={r.id}
                 style={{
                   background: '#111',
-                  border: `1px solid ${expanded === r.id ? '#D4537E33' : '#1a1a1a'}`,
+                  border: `1px solid ${expanded === r.id ? '#e8185033' : '#1a1a1a'}`,
                   borderRadius: '10px',
                   overflow: 'hidden',
                 }}

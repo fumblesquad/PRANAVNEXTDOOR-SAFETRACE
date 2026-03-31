@@ -107,10 +107,10 @@ export default function TrackTab() {
                 onClick={() => handleSavedClick(id)}
                 style={{
                   padding: '6px 12px',
-                  background: caseInput === id ? 'rgba(212,83,126,0.1)' : '#111',
-                  border: `1px solid ${caseInput === id ? '#D4537E' : '#222'}`,
+                  background: caseInput === id ? 'rgba(232,24,80,0.1)' : '#111',
+                  border: `1px solid ${caseInput === id ? '#e81850' : '#222'}`,
                   borderRadius: '6px',
-                  color: caseInput === id ? '#D4537E' : '#555',
+                  color: caseInput === id ? '#e81850' : '#555',
                   fontSize: '12px',
                   fontFamily: 'monospace',
                   cursor: 'pointer',
@@ -142,7 +142,7 @@ export default function TrackTab() {
           disabled={loading}
           style={{
             padding: '12px 20px',
-            background: loading ? '#7a2f4a' : '#D4537E',
+            background: loading ? '#7a2f4a' : '#e81850',
             border: 'none', borderRadius: '8px',
             color: '#fff', fontSize: '14px', fontWeight: 600,
             cursor: loading ? 'not-allowed' : 'pointer',
@@ -154,7 +154,7 @@ export default function TrackTab() {
       </form>
 
       {error && (
-        <p style={{ color: '#D4537E', fontSize: '13px', marginBottom: '16px' }}>{error}</p>
+        <p style={{ color: '#e81850', fontSize: '13px', marginBottom: '16px' }}>{error}</p>
       )}
 
       {/* Report card */}
@@ -177,7 +177,7 @@ export default function TrackTab() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
             <div>
               <p style={labelStyle}>Type</p>
-              <p style={{ color: '#D4537E', fontSize: '13px', margin: 0, textTransform: 'capitalize' }}>
+              <p style={{ color: '#e81850', fontSize: '13px', margin: 0, textTransform: 'capitalize' }}>
                 {capitalizeFirst(report.type)}
               </p>
             </div>
@@ -213,7 +213,7 @@ export default function TrackTab() {
                         position: 'absolute',
                         left: '-50%', top: '9px',
                         width: '100%', height: '2px',
-                        background: (done || active) ? '#D4537E' : '#1e1e1e',
+                        background: (done || active) ? '#e81850' : '#1e1e1e',
                       }} />
                     )}
 
@@ -231,20 +231,20 @@ export default function TrackTab() {
                             position: 'absolute',
                             inset: '-4px',
                             borderRadius: '50%',
-                            background: 'rgba(212,83,126,0.4)',
+                            background: 'rgba(232,24,80,0.4)',
                             animation: 'trackPulse 1.6s ease-in-out infinite',
                           }} />
                           <div style={{
                             width: '20px', height: '20px', borderRadius: '50%',
-                            background: '#D4537E',
+                            background: '#e81850',
                             position: 'relative', zIndex: 1,
                           }} />
                         </div>
                       ) : (
                         <div style={{
                           width: '20px', height: '20px', borderRadius: '50%',
-                          background: done ? '#D4537E' : '#0a0a0a',
-                          border: `2px solid ${done ? '#D4537E' : '#222'}`,
+                          background: done ? '#e81850' : '#0a0a0a',
+                          border: `2px solid ${done ? '#e81850' : '#222'}`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
                           {done && (
@@ -262,7 +262,7 @@ export default function TrackTab() {
                       fontSize: '9px',
                       textAlign: 'center',
                       lineHeight: 1.3,
-                      color: active ? '#D4537E' : done ? '#666' : '#333',
+                      color: active ? '#e81850' : done ? '#666' : '#333',
                       fontWeight: active ? 600 : 400,
                     }}>
                       {STATUS_LABELS[step]}
