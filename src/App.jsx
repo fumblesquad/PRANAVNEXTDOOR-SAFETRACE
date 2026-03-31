@@ -60,15 +60,81 @@ const STATIC_SAFE_PLACES = [
   { id: 'cr-11', name: 'Phoenix MarketCity', lat: 12.9914, lng: 80.2183, tags: ['crowd'] },
   { id: 'cr-12', name: 'Forum Vijaya Mall', lat: 13.0411, lng: 80.2104, tags: ['crowd'] },
 ];
-
-const STATIC_UNSAFE_ZONES = [];
-
-const CHENNAI_LOCALITIES = { 'anna nagar': { lat: 13.0850, lng: 80.2101 }, 't nagar': { lat: 13.0418, lng: 80.2341 }, 'adyar': { lat: 13.0012, lng: 80.2565 }, 'mylapore': { lat: 13.0368, lng: 80.2676 }, 'velachery': { lat: 12.9815, lng: 80.2209 }, 'tambaram': { lat: 12.9229, lng: 80.1275 }, 'guindy': { lat: 13.0067, lng: 80.2206 }, 'egmore': { lat: 13.0732, lng: 80.2609 }, 'nungambakkam': { lat: 13.0569, lng: 80.2425 }, 'kodambakkam': { lat: 13.0519, lng: 80.2248 }, 'royapettah': { lat: 13.0596, lng: 80.2616 }, 'perambur': { lat: 13.1143, lng: 80.2452 }, 'tondiarpet': { lat: 13.1213, lng: 80.2883 }, 'omr': { lat: 12.9600, lng: 80.2400 }, 'marina': { lat: 13.0500, lng: 80.2824 }, 'besant nagar': { lat: 12.9990, lng: 80.2707 } };
 const HAZARD_WEIGHTS = [{ pattern: /murder|homicide|kill/gi, type: 'crime_violent', base: 0.80 }, { pattern: /assault|attack|stab|shoot/gi, type: 'crime_violent', base: 0.70 }, { pattern: /robbery|loot|snatch|theft|burglary/gi, type: 'crime_property', base: 0.60 }, { pattern: /rape|sexual|molest|harass/gi, type: 'crime_sexual', base: 0.85 }, { pattern: /accident|crash|collision|hit\.and\.run/gi, type: 'road_accident', base: 0.50 }, { pattern: /flood|waterlog|inundat/gi, type: 'flood', base: 0.60 }, { pattern: /fire|blaze|burn/gi, type: 'fire', base: 0.65 }, { pattern: /protest|riot|agitation|bandh/gi, type: 'civil_unrest', base: 0.40 }];
 
 async function fetchNearbyPlaces(lat, lng, apiKey) { const types = [{ type: 'police', tag: 'police', radius: 5000 }, { type: 'hospital', tag: 'hospital', radius: 5000 }, { type: 'university', tag: 'school', radius: 5000 }, { type: 'shopping_mall', tag: 'crowd', radius: 5000 }, { type: 'train_station', tag: 'crowd', radius: 5000 }]; const all = [], seen = new Set(); await Promise.allSettled(types.map(async ({ type, tag, radius }) => { try { const data = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${apiKey}`).then(r => r.json()); if (data.status === 'OK' && data.results) for (const p of data.results) { if (seen.has(p.place_id)) continue; seen.add(p.place_id); all.push({ id: `gp-${p.place_id}`, name: p.name, lat: p.geometry.location.lat, lng: p.geometry.location.lng, tags: [tag], source: 'google', rating: p.rating || null, vicinity: p.vicinity || '', openNow: p.opening_hours?.open_now ?? null }); } } catch (e) { } })); return all; }
+async function geocodeTextLocation(query, apiKey) {
+  if (!query || !apiKey || apiKey === 'YOUR_GOOGLE_API_KEY_HERE') return null;
+  try {
+    const data = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${apiKey}`).then(r => r.json());
+    if (data.status !== 'OK' || !data.results?.length) return null;
+    const result = data.results[0];
+    const loc = result.geometry?.location;
+    if (!loc) return null;
+    return {
+      lat: loc.lat,
+      lng: loc.lng,
+      formattedAddress: result.formatted_address || query,
+    };
+  } catch (_) {
+    return null;
+  }
+}
 
-async function fetchNewsHazards(newsApiKey, city = 'Chennai') { const zones = []; try { const queries = [`${city} crime`, `${city} accident`, `${city} flood fire`]; const allA = []; for (const q of queries) { try { const data = await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=15&apiKey=${newsApiKey}`).then(r => r.json()); if (data.status === 'ok' && data.articles) allA.push(...data.articles); } catch (e) { } } const seen = new Set(); const unique = allA.filter(a => { if (!a.url || seen.has(a.url)) return false; seen.add(a.url); return true; }); for (const article of unique) { const text = `${article.title || ''} ${article.description || ''}`.toLowerCase(); let ml = null, mc = null; for (const [l, c] of Object.entries(CHENNAI_LOCALITIES)) { if (text.includes(l)) { ml = l; mc = c; break; } } if (!mc) continue; let severityScore = 0; let ht = 'news_general'; let maxBase = 0; for (const { pattern, type, base } of HAZARD_WEIGHTS) { const matches = text.match(pattern); if (matches) { const freq = matches.length; const termScore = base * (1 + 0.3 * Math.log2(freq)); severityScore += termScore; if (base > maxBase) { maxBase = base; ht = type; } } } if (severityScore === 0) severityScore = 0.3; const normalizedScore = Math.min(severityScore, 0.95); const aH = Math.max(0, (Date.now() - new Date(article.publishedAt).getTime()) / 36e5); const decayFactor = Math.exp(-0.0144 * aH); const finalRisk = Math.max(0.1, Math.min(0.99, normalizedScore * decayFactor)); const jL = (Math.random() - 0.5) * 0.003, jN = (Math.random() - 0.5) * 0.003; zones.push({ id: `nz-${zones.length + 1}`, lat: mc.lat + jL, lng: mc.lng + jN, type: ht, risk: parseFloat(finalRisk.toFixed(2)), radius: 250, label: (article.title || 'News Alert').slice(0, 80), note: (article.description || '').slice(0, 120) || `Reported near ${ml}`, source: 'newsapi', publishedAt: article.publishedAt }); } } catch (e) { } return zones; }
+async function fetchNewsHazards(newsApiKey, city = 'Chennai') {
+  const zones = [];
+  if (!newsApiKey) return zones;
+  try {
+    const queries = [`${city} crime`, `${city} accident`, `${city} flood fire`];
+    const allA = [];
+    for (const q of queries) {
+      try {
+        const data = await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=15&apiKey=${newsApiKey}`).then(r => r.json());
+        if (data.status === 'ok' && data.articles) allA.push(...data.articles);
+      } catch (_) { }
+    }
+    const seen = new Set();
+    const unique = allA.filter(a => {
+      if (!a.url || seen.has(a.url)) return false;
+      seen.add(a.url);
+      return true;
+    });
+    for (const article of unique) {
+      const text = `${article.title || ''} ${article.description || ''}`.toLowerCase();
+      let severityScore = 0; let ht = 'news_general'; let maxBase = 0;
+      for (const { pattern, type, base } of HAZARD_WEIGHTS) {
+        const matches = text.match(pattern);
+        if (matches) {
+          const freq = matches.length;
+          const termScore = base * (1 + 0.3 * Math.log2(freq));
+          severityScore += termScore;
+          if (base > maxBase) { maxBase = base; ht = type; }
+        }
+      }
+      if (severityScore === 0) severityScore = 0.3;
+      const normalizedScore = Math.min(severityScore, 0.95);
+      const aH = Math.max(0, (Date.now() - new Date(article.publishedAt).getTime()) / 36e5);
+      const decayFactor = Math.exp(-0.0144 * aH);
+      const finalRisk = Math.max(0.1, Math.min(0.99, normalizedScore * decayFactor));
+      const locationQuery = [article.title, article.description, `${city}, India`].filter(Boolean).join(', ');
+      const geocoded = await geocodeTextLocation(locationQuery, GOOGLE_API_KEY);
+      if (!geocoded) continue;
+      zones.push({
+        id: article.url ? `nz-${btoa(article.url).replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)}` : `nz-${zones.length + 1}`,
+        lat: geocoded.lat,
+        lng: geocoded.lng,
+        type: ht,
+        risk: parseFloat(finalRisk.toFixed(2)),
+        radius: 250,
+        label: (article.title || 'News Alert').slice(0, 80),
+        note: (article.description || '').slice(0, 120) || geocoded.formattedAddress,
+        source: 'newsapi',
+        publishedAt: article.publishedAt,
+      });
+    }
+  } catch (_) { }
+  return zones;
+}
 
 function haversine(a, b) { const R = 6371000, dLat = (b.lat - a.lat) * Math.PI / 180, dLng = (b.lng - a.lng) * Math.PI / 180; const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2; return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x)); }
 function decodePolyline(e) { let i = 0, lat = 0, lng = 0; const o = []; while (i < e.length) { let b, s = 0, r = 0; do { b = e.charCodeAt(i++) - 63; r |= (b & 0x1f) << s; s += 5; } while (b >= 0x20); lat += r & 1 ? ~(r >> 1) : r >> 1; s = 0; r = 0; do { b = e.charCodeAt(i++) - 63; r |= (b & 0x1f) << s; s += 5; } while (b >= 0x20); lng += r & 1 ? ~(r >> 1) : r >> 1; o.push([lat / 1e5, lng / 1e5]); } return o; }
@@ -104,6 +170,7 @@ async function fetchRoute(start, end, unsafeZones = []) {
 }
 function fmDist(m) { return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`; }
 function fmWalk(m) { const mins = Math.ceil(m / 80); return mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)}h ${mins % 60}m`; }
+function hasNewsHazardFeed() { return Boolean(NEWSAPI_KEY && NEWSAPI_KEY !== 'YOUR_NEWSAPI_KEY_HERE'); }
 const DIR_ICON = { 'turn-left': { icon: '↰' }, 'turn-right': { icon: '↱' }, 'turn-sharp-left': { icon: '↺' }, 'turn-sharp-right': { icon: '↻' }, 'turn-slight-left': { icon: '↖' }, 'turn-slight-right': { icon: '↗' }, 'uturn-left': { icon: '↩' }, 'uturn-right': { icon: '↪' }, straight: { icon: '↑' }, 'ramp-left': { icon: '↰' }, 'ramp-right': { icon: '↱' }, merge: { icon: '⤵' }, 'fork-left': { icon: '⑂' }, 'fork-right': { icon: '⑂' }, ferry: { icon: '⛴' }, 'roundabout-left': { icon: '⟳' }, 'roundabout-right': { icon: '⟳' }, left: { icon: '↰' }, right: { icon: '↱' }, 'sharp left': { icon: '↺' }, 'sharp right': { icon: '↻' }, 'slight left': { icon: '↖' }, 'slight right': { icon: '↗' }, 'u-turn': { icon: '↩' }, arrive: { icon: '🏁' }, depart: { icon: '↑' } };
 function getDir(step) { const man = (step.maneuver || '').toLowerCase(), txt = (step.instruction || '').toLowerCase(); if (DIR_ICON[man]) return DIR_ICON[man]; if (txt.includes('arrive') || txt.includes('destination')) return DIR_ICON.arrive; if (txt.includes('left')) return DIR_ICON.left; if (txt.includes('right')) return DIR_ICON.right; if (txt.includes('straight') || txt.includes('continue')) return DIR_ICON.straight; return { icon: '↑' }; }
 
@@ -562,7 +629,7 @@ function NavOverlay({ steps, stepIndex, setStepIndex, totalDist, totalTime, dest
 }
 
 // ═══════════════════════════════════════════════════════════════════
-function PlaceDrawer({ pin, nearby, dest, routeData, loading, showUnsafe, onToggleUnsafe, onSelectDest, onStartNav, onReset, onChangeDest, placesLoading }) {
+function PlaceDrawer({ pin, nearby, dest, routeData, loading, showUnsafe, onToggleUnsafe, onSelectDest, onStartNav, onReset, onChangeDest, placesLoading, canToggleHazards }) {
   const [open, setOpen] = useState(true); if (!pin) return null;
   return (<div style={{ position: 'absolute', bottom: 72, left: 0, right: 0, zIndex: 900, maxHeight: open ? '50%' : 48, transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1)', display: 'flex', flexDirection: 'column', fontFamily: "'Poppins',sans-serif" }}>
     <div onClick={() => setOpen(v => !v)} style={{ background: 'rgba(7,7,14,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid #e8185028', borderRadius: '22px 22px 0 0', padding: '10px 20px 8px', cursor: 'pointer' }}>
@@ -570,7 +637,7 @@ function PlaceDrawer({ pin, nearby, dest, routeData, loading, showUnsafe, onTogg
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div><span style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>Nearby</span><span style={{ fontSize: 11, color: '#ffffff28', marginLeft: 8, fontWeight: 500 }}>{placesLoading ? 'loading...' : dest ? 'route ready' : `${nearby.length} places`}</span></div>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={e => { e.stopPropagation(); onToggleUnsafe(); }} style={{ background: showUnsafe ? '#e8185010' : 'none', border: `1px solid ${showUnsafe ? '#e8185030' : '#ffffff08'}`, color: showUnsafe ? '#e81850' : '#ffffff28', borderRadius: 20, padding: '4px 10px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>⚠</button>
+          {canToggleHazards && <button onClick={e => { e.stopPropagation(); onToggleUnsafe(); }} style={{ background: showUnsafe ? '#e8185010' : 'none', border: `1px solid ${showUnsafe ? '#e8185030' : '#ffffff08'}`, color: showUnsafe ? '#e81850' : '#ffffff28', borderRadius: 20, padding: '4px 10px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>⚠</button>}
           <button onClick={e => { e.stopPropagation(); onReset(); }} style={{ background: 'none', border: '1px solid #ffffff08', color: '#ffffff28', borderRadius: 20, padding: '4px 12px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500 }}>Reset</button>
         </div>
       </div>
@@ -1038,13 +1105,62 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
 
 // ═══════════════════════════════════════════════════════════════════
 function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPinChange }) {
-  const [pin, setPin] = useState(null); const [nearby, setNearby] = useState([]); const [dest, setDest] = useState(null); const [routeData, setRouteData] = useState(null); const [loading, setLoading] = useState(false); const [navigating, setNavigating] = useState(false); const [stepIndex, setStepIndex] = useState(0); const [showUnsafe, setShowUnsafe] = useState(true); const [safePlaces, setSafePlaces] = useState(STATIC_SAFE_PLACES); const [unsafeZones, setUnsafeZones] = useState(STATIC_UNSAFE_ZONES); const [newsLoading, setNewsLoading] = useState(false); const [placesLoading, setPlacesLoading] = useState(false); const [dataStatus, setDataStatus] = useState({ places: 'static', news: 'static' }); const [mapReady, setMapReady] = useState(false); const newsFetched = useRef(false);
+  const [pin, setPin] = useState(null); const [nearby, setNearby] = useState([]); const [dest, setDest] = useState(null); const [routeData, setRouteData] = useState(null); const [loading, setLoading] = useState(false); const [navigating, setNavigating] = useState(false); const [stepIndex, setStepIndex] = useState(0); const [showUnsafe, setShowUnsafe] = useState(true); const [safePlaces, setSafePlaces] = useState(STATIC_SAFE_PLACES); const [unsafeZones, setUnsafeZones] = useState([]); const [newsLoading, setNewsLoading] = useState(false); const [placesLoading, setPlacesLoading] = useState(false); const [dataStatus, setDataStatus] = useState({ places: 'static', news: 'idle' }); const [mapReady, setMapReady] = useState(false); const newsFetched = useRef(false);
   const [showArrival, setShowArrival] = useState(false); const [arrivedDest, setArrivedDest] = useState('');
+  const hazardFeedEnabled = hasNewsHazardFeed();
+  const placesFeedEnabled = Boolean(GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_API_KEY_HERE');
 
   useEffect(() => { if (!document.getElementById('leaflet-css')) { const l = document.createElement('link'); l.id = 'leaflet-css'; l.rel = 'stylesheet'; l.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(l); } if (!window.L) { const s = document.createElement('script'); s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; s.onload = () => setMapReady(true); document.head.appendChild(s); } else setMapReady(true); }, []);
-  useEffect(() => { if (newsFetched.current) return; if (!NEWSAPI_KEY || NEWSAPI_KEY === 'YOUR_NEWSAPI_KEY_HERE') return; newsFetched.current = true; setNewsLoading(true); fetchNewsHazards(NEWSAPI_KEY).then(nz => { if (nz.length > 0) { setUnsafeZones(p => [...p, ...nz]); setDataStatus(p => ({ ...p, news: 'live' })); } }).catch(() => { }).finally(() => setNewsLoading(false)); }, []);
+  useEffect(() => {
+    if (newsFetched.current) return;
+    if (!hazardFeedEnabled) {
+      setUnsafeZones([]);
+      setDataStatus(p => ({ ...p, news: 'unavailable' }));
+      return;
+    }
+    newsFetched.current = true;
+    setNewsLoading(true);
+    fetchNewsHazards(NEWSAPI_KEY)
+      .then(nz => {
+        setUnsafeZones(nz);
+        setDataStatus(p => ({ ...p, news: nz.length > 0 ? 'live' : 'ready' }));
+      })
+      .catch(() => {
+        setUnsafeZones([]);
+        setDataStatus(p => ({ ...p, news: 'error' }));
+      })
+      .finally(() => setNewsLoading(false));
+  }, [hazardFeedEnabled]);
 
-  const fetchPlacesForPin = useCallback(async (lat, lng) => { if (!GOOGLE_API_KEY || GOOGLE_API_KEY === 'YOUR_GOOGLE_API_KEY_HERE') return STATIC_SAFE_PLACES; setPlacesLoading(true); try { const dp = await fetchNearbyPlaces(lat, lng, GOOGLE_API_KEY); if (dp.length > 0) { const m = [...dp]; for (const s of STATIC_SAFE_PLACES) if (!dp.some(d => haversine({ lat: s.lat, lng: s.lng }, { lat: d.lat, lng: d.lng }) < 100)) m.push(s); setSafePlaces(m); setDataStatus(p => ({ ...p, places: 'live' })); return m; } } catch (e) { } finally { setPlacesLoading(false); } return STATIC_SAFE_PLACES; }, []);
+  const fetchPlacesForPin = useCallback(async (lat, lng) => {
+    if (!placesFeedEnabled) {
+      setSafePlaces(STATIC_SAFE_PLACES);
+      setDataStatus(p => ({ ...p, places: 'static' }));
+      return STATIC_SAFE_PLACES;
+    }
+    setPlacesLoading(true);
+    try {
+      const dp = await fetchNearbyPlaces(lat, lng, GOOGLE_API_KEY);
+      if (dp.length > 0) {
+        const merged = [...dp];
+        for (const s of STATIC_SAFE_PLACES) {
+          if (!dp.some(d => haversine({ lat: s.lat, lng: s.lng }, { lat: d.lat, lng: d.lng }) < 100)) merged.push(s);
+        }
+        setSafePlaces(merged);
+        setDataStatus(p => ({ ...p, places: 'live' }));
+        return merged;
+      }
+      setSafePlaces(STATIC_SAFE_PLACES);
+      setDataStatus(p => ({ ...p, places: 'static' }));
+      return STATIC_SAFE_PLACES;
+    } catch (e) {
+      setSafePlaces(STATIC_SAFE_PLACES);
+      setDataStatus(p => ({ ...p, places: 'error' }));
+      return STATIC_SAFE_PLACES;
+    } finally {
+      setPlacesLoading(false);
+    }
+  }, [placesFeedEnabled]);
 
   const handlePinDrop = useCallback(async (latlng) => { if (navigating) return; const { lat, lng } = latlng; setPin({ lat, lng }); const places = await fetchPlacesForPin(lat, lng); setNearby([...places].map(p => ({ ...p, _dist: haversine({ lat, lng }, p) })).sort((a, b) => a._dist - b._dist).slice(0, 8)); }, [navigating, fetchPlacesForPin]);
   async function handleSelectDest(p) { setDest(p); setRouteData(null); setLoading(true); setRouteData(await fetchRoute(pin, p, unsafeZones)); setLoading(false); }
@@ -1057,6 +1173,7 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
   const safeCount = pin ? safePlaces.filter(p => (p.tags[0] === 'police' || p.tags[0] === 'hospital') && haversine(pin, p) <= 15000).length : safePlaces.filter(p => p.tags[0] === 'police' || p.tags[0] === 'hospital').length;
   const riskHigh = pin ? unsafeZones.filter(z => z.risk >= 0.75 && haversine(pin, { lat: z.lat, lng: z.lng }) <= 15000).length : unsafeZones.filter(z => z.risk >= 0.75).length;
   const riskTotal = pin ? unsafeZones.filter(z => haversine(pin, { lat: z.lat, lng: z.lng }) <= 15000).length : unsafeZones.length;
+  const showHazards = hazardFeedEnabled && showUnsafe;
 
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative', background: '#000000' }}>
@@ -1066,9 +1183,9 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
           <span style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>Safe</span><span style={{ fontSize: 24, fontWeight: 800, color: '#e81850', letterSpacing: '-0.01em' }}>Trace</span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {(dataStatus.places === 'live' || dataStatus.news === 'live') && !newsLoading && !placesLoading && <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#ffffff08', borderRadius: 20, padding: '4px 10px' }}>
+          {(dataStatus.places === 'live' || dataStatus.places === 'ready' || dataStatus.news === 'live' || dataStatus.news === 'ready') && !newsLoading && !placesLoading && <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#ffffff08', borderRadius: 20, padding: '4px 10px' }}>
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399' }} />
-            <span style={{ fontSize: 9, color: '#34d399', fontFamily: "'Poppins',sans-serif", fontWeight: 600 }}>LIVE</span>
+            <span style={{ fontSize: 9, color: '#34d399', fontFamily: "'Poppins',sans-serif", fontWeight: 600 }}>{dataStatus.places === 'live' || dataStatus.news === 'live' ? 'LIVE' : 'READY'}</span>
           </div>}
         </div>
       </div>}
@@ -1082,11 +1199,11 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
       {pin && !dest && !navigating && mapReady && (
         <div style={{ position: 'absolute', top: 72, left: 0, right: 0, zIndex: 799, padding: '0 12px', paddingRight: '72px', pointerEvents: 'none', animation: 'fadeUp 0.4s ease both' }}>
           <div style={{ display: 'flex', gap: 8 }}>
-            {[
-              { icon: '🛡️', value: `${safeCount}`, sub: 'Safe spots in 15km', color: '#34d399' },
-              { icon: '⚠️', value: `${riskTotal}`, sub: `${riskHigh} high risk in 15km`, color: '#e81850' },
-              { icon: '📡', value: 'Live', sub: 'Monitoring active', color: '#38bdf8' },
-            ].map((card, i) => (
+                {[
+                { icon: '🛡️', value: `${safeCount}`, sub: placesFeedEnabled ? 'Dynamic safe spots in 15km' : 'Places feed unavailable', color: '#34d399' },
+                { icon: '⚠️', value: `${riskTotal}`, sub: hazardFeedEnabled ? `${riskHigh} news hazard points in 15km` : 'News hazard feed unavailable', color: '#e81850' },
+                { icon: '📡', value: placesFeedEnabled || hazardFeedEnabled ? 'Live' : 'Off', sub: placesFeedEnabled || hazardFeedEnabled ? 'Dynamic data sources active' : 'Add API keys to enable', color: '#38bdf8' },
+              ].map((card, i) => (
               <div key={i} style={{
                 flex: 1, background: 'rgba(7,7,14,0.92)', backdropFilter: 'blur(16px)',
                 border: '1px solid #ffffff08', borderRadius: 14, padding: '10px 10px',
@@ -1108,13 +1225,13 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPin
       {loading && <div style={{ position: 'absolute', bottom: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 800, background: 'rgba(7,7,14,0.92)', border: '1px solid #e8185033', color: '#e81850', padding: '10px 24px', borderRadius: 24, fontSize: 12, backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Poppins',sans-serif", fontWeight: 500 }}><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>Calculating route...</div>}
 
       {/* Data loading */}
-      {(newsLoading || placesLoading) && <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 800, background: 'rgba(7,7,14,0.92)', border: '1px solid #38bdf822', color: '#38bdf8', padding: '6px 18px', borderRadius: 20, fontSize: 10, backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Poppins',sans-serif", fontWeight: 500 }}><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>{newsLoading && placesLoading ? 'Loading live data...' : newsLoading ? 'Fetching news...' : 'Fetching places...'}</div>}
+      {(newsLoading || placesLoading) && <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 800, background: 'rgba(7,7,14,0.92)', border: '1px solid #38bdf822', color: '#38bdf8', padding: '6px 18px', borderRadius: 20, fontSize: 10, backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Poppins',sans-serif", fontWeight: 500 }}><span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>◌</span>{newsLoading && placesLoading ? 'Loading live data...' : newsLoading ? 'Fetching hazard news...' : 'Fetching places...'}</div>}
 
       {/* Risk legend */}
-      {showUnsafe && !navigating && pin && <div style={{ position: 'absolute', bottom: 84, right: 10, zIndex: 800, background: 'rgba(7,7,14,0.88)', border: '1px solid #ffffff08', borderRadius: 14, padding: '8px 12px', backdropFilter: 'blur(12px)', fontFamily: "'DM Mono',monospace", fontSize: 8, letterSpacing: '0.08em' }}>{[{ l: 'HIGH', c: '#e81850' }, { l: 'MED', c: '#ff9500' }, { l: 'LOW', c: '#ffcc00' }].map(r => <div key={r.l} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: r.c, boxShadow: `0 0 4px ${r.c}` }} /><span style={{ color: r.c, fontSize: 8 }}>{r.l}</span></div>)}</div>}
+      {showHazards && !navigating && pin && <div style={{ position: 'absolute', bottom: 84, right: 10, zIndex: 800, background: 'rgba(7,7,14,0.88)', border: '1px solid #ffffff08', borderRadius: 14, padding: '8px 12px', backdropFilter: 'blur(12px)', fontFamily: "'DM Mono',monospace", fontSize: 8, letterSpacing: '0.08em' }}>{[{ l: 'HIGH', c: '#e81850' }, { l: 'MED', c: '#ff9500' }, { l: 'LOW', c: '#ffcc00' }].map(r => <div key={r.l} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: r.c, boxShadow: `0 0 4px ${r.c}` }} /><span style={{ color: r.c, fontSize: 8 }}>{r.l}</span></div>)}</div>}
 
       {/* Place drawer */}
-      {!navigating && <PlaceDrawer pin={pin} nearby={nearby} dest={dest} routeData={routeData} loading={loading} showUnsafe={showUnsafe} onToggleUnsafe={() => setShowUnsafe(v => !v)} onSelectDest={handleSelectDest} onStartNav={handleStartNav} onReset={handleReset} onChangeDest={handleChangeDest} placesLoading={placesLoading} />}
+      {!navigating && <PlaceDrawer pin={pin} nearby={nearby} dest={dest} routeData={routeData} loading={loading} showUnsafe={showHazards} onToggleUnsafe={() => setShowUnsafe(v => !v)} onSelectDest={handleSelectDest} onStartNav={handleStartNav} onReset={handleReset} onChangeDest={handleChangeDest} placesLoading={placesLoading} canToggleHazards={hazardFeedEnabled} />}
 
       {/* Nav overlay */}
       {navigating && routeData && <NavOverlay steps={routeData.steps} stepIndex={stepIndex} setStepIndex={setStepIndex} totalDist={routeData.totalDist} totalTime={routeData.totalTime} destName={dest?.name} onEnd={handleArrived} />}
