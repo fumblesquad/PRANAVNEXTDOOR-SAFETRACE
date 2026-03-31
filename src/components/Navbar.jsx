@@ -27,8 +27,8 @@ export default function Navbar() {
       zIndex: 100,
     }}>
       <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <div style={{ fontFamily: "'Poppins',sans-serif" }}>
-          <span style={{ color: '#e81850', fontWeight: 800, fontSize: '28px', letterSpacing: '1px' }}>SAFE</span><span style={{ color: '#fff', fontWeight: 400, fontSize: '28px' }}>TRACE</span>
+        <div style={{ fontFamily: "'Poppins',sans-serif", marginTop: '4px' }}>
+          <span style={{ color: '#e81850', fontWeight: 800, fontSize: '24px', letterSpacing: '1px' }}>SAFE</span><span style={{ color: '#fff', fontWeight: 400, fontSize: '24px' }}>TRACE</span>
         </div>
       </Link>
 
