@@ -990,7 +990,7 @@ function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim }) {
       {/* Header */}
       {!navigating && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 800, padding: '14px 20px 10px', paddingRight: '72px', background: 'linear-gradient(180deg,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.7) 60%,transparent 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/favicon.svg" alt="SafeTrace Icon" style={{ height: 24 }} />
+          <img src="/favicon.svg" alt="SafeTrace Icon" style={{ height: 50 }} />
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {(dataStatus.places === 'live' || dataStatus.news === 'live') && !newsLoading && !placesLoading && <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#ffffff08', borderRadius: 20, padding: '4px 10px' }}>

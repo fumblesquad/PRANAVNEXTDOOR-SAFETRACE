@@ -27,7 +27,7 @@ export default function Navbar() {
       zIndex: 100,
     }}>
       <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <img src="/favicon.svg" alt="SafeTrace Icon" style={{ height: '24px' }} />
+        <img src="/favicon.svg" alt="SafeTrace Icon" style={{ height: '50px' }} />
       </Link>
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
