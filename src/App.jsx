@@ -695,7 +695,7 @@ function BottomNav({ activeTab, onMap, onComplaint, onTrack }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-function LandingPage({ onEnter, onPolicePortal, fallbackLocation, activeSOSCount }) {
+function LandingPage({ onEnter, fallbackLocation }) {
   const [phase, setPhase] = useState('first'); // first | confirm | sending | sent
   const sentRef = useRef(false);
   useEffect(() => {
@@ -721,10 +721,7 @@ function LandingPage({ onEnter, onPolicePortal, fallbackLocation, activeSOSCount
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: isSent ? '#040e08' : isRed ? '#12060a' : '#000000', fontFamily: "'Poppins',sans-serif", animation: 'fadeIn 0.5s ease', position: 'relative', transition: 'background 0.6s' }}>
       {/* Subtle dot grid */}
       <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(#e81850 1px, transparent 1px)', backgroundSize: '32px 32px', pointerEvents: 'none' }} />
-      <button onClick={onPolicePortal} style={{ position: 'absolute', top: 18, right: 18, zIndex: 2, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: '#11070b', border: '1px solid #e8474f33', borderRadius: 999, color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', fontFamily: "'Poppins',sans-serif", cursor: 'pointer', boxShadow: '0 0 24px rgba(232,24,80,0.12)' }}>
-        <span>LIVE EMERGENCIES</span>
-        {activeSOSCount > 0 && <span style={{ minWidth: 22, height: 22, padding: '0 7px', borderRadius: 999, background: '#CE2029', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800 }}>{activeSOSCount}</span>}
-      </button>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(#e81850 1px, transparent 1px)', backgroundSize: '32px 32px', pointerEvents: 'none' }} />
 
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/* Title */}
@@ -1075,216 +1072,6 @@ function TrackPage({ onBack, activeTab, onMap, onComplaint, onTrack }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-function PolicePortalPage({ onBack }) {
-  const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [busyAlertId, setBusyAlertId] = useState('');
-  const [view, setView] = useState('live');
-
-  useEffect(() => {
-    let mounted = true;
-    async function loadAlerts() {
-      setLoading(true);
-      const [
-        { data: activeAlerts, error: activeError },
-        { data: respondingAlerts, error: respondingError },
-        { data: resolvedAlerts, error: resolvedError },
-      ] = await Promise.all([
-        supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }),
-        supabase.from('sos_alerts').select('*').eq('status', 'responding').order('created_at', { ascending: false }),
-        supabase.from('sos_alerts').select('*').eq('status', 'resolved').order('created_at', { ascending: false }),
-      ]);
-      if (activeError || respondingError || resolvedError) {
-        console.error('[SOS] Failed to load alerts:', activeError || respondingError || resolvedError);
-      }
-      if (mounted) {
-        setAlerts(sortSOSAlerts([...(activeAlerts || []), ...(respondingAlerts || []), ...(resolvedAlerts || [])]));
-        setLoading(false);
-      }
-    }
-
-    loadAlerts();
-
-    const channel = supabase
-      .channel('sos-live')
-      .on('postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'sos_alerts' },
-        payload => {
-          console.log('[SOS] New alert received:', payload.new);
-          playAlertSound();
-          setAlerts(prev => upsertSOSAlert(prev, payload.new));
-        }
-      )
-      .on('postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'sos_alerts' },
-        payload => {
-          console.log('[SOS] Alert updated:', payload.new);
-          setAlerts(prev => upsertSOSAlert(prev, payload.new));
-        }
-      )
-      .subscribe();
-
-    return () => {
-      mounted = false;
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const activeAlerts = alerts.filter(alert => normalizeSOSStatus(alert.status) === 'active');
-  const respondingAlerts = alerts.filter(alert => normalizeSOSStatus(alert.status) === 'responding');
-  const resolvedAlerts = alerts.filter(alert => normalizeSOSStatus(alert.status) === 'resolved');
-  const unresolvedCount = activeAlerts.length + respondingAlerts.length;
-
-  const handleRespond = async (alertId) => {
-    setBusyAlertId(alertId);
-    try {
-      await updateSOSStatus(alertId, { status: 'responding', resolved_by: 'Officer on duty' });
-    } finally {
-      setBusyAlertId('');
-    }
-  };
-
-  const handleResolve = async (alertId) => {
-    setBusyAlertId(alertId);
-    try {
-      await updateSOSStatus(alertId, {
-        status: 'resolved',
-        resolved_at: new Date().toISOString(),
-        resolved_by: 'Officer on duty',
-      });
-    } finally {
-      setBusyAlertId('');
-    }
-  };
-
-  const Section = ({ title, subtitle, items, tone }) => {
-    const theme = tone === 'active'
-      ? { badge: '#ffd6da', border: '#e8474f33', bg: 'linear-gradient(180deg,#22090d 0%,#12060a 100%)' }
-      : tone === 'responding'
-        ? { badge: '#ffe8b3', border: '#ffb02033', bg: 'linear-gradient(180deg,#1f1606 0%,#100b04 100%)' }
-        : { badge: '#d2d7df', border: '#ffffff10', bg: 'linear-gradient(180deg,#101217 0%,#090b0f 100%)' };
-    if (!items.length) return null;
-    return (
-      <div style={{ marginBottom: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{title}</div>
-            <div style={{ fontSize: 11, color: '#ffffff33', marginTop: 2 }}>{subtitle}</div>
-          </div>
-          <div style={{ minWidth: 28, height: 28, padding: '0 10px', borderRadius: 999, background: theme.bg, border: `1px solid ${theme.border}`, color: theme.badge, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>{items.length}</div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {items.map(alert => {
-            const status = normalizeSOSStatus(alert.status);
-            const isBusy = busyAlertId === alert.alert_id;
-            const isActive = status === 'active';
-            const isResponding = status === 'responding';
-            const cardBg = isActive
-              ? 'linear-gradient(180deg,#260b10 0%,#15070b 100%)'
-              : isResponding
-                ? 'linear-gradient(180deg,#261b08 0%,#141005 100%)'
-                : 'linear-gradient(180deg,#141820 0%,#0b0f15 100%)';
-            const accent = isActive ? '#e8474f' : isResponding ? '#ffb020' : '#9aa4b2';
-            return (
-              <div key={alert.id} style={{ background: cardBg, border: `1px solid ${accent}22`, borderRadius: 18, padding: '16px 16px 14px', boxShadow: isActive ? '0 0 30px rgba(232,24,80,0.12)' : 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                      <div style={{ width: 12, height: 12, borderRadius: '50%', background: accent, boxShadow: `0 0 14px ${accent}`, animation: isActive ? 'alertBlink 1.2s ease-in-out infinite' : 'none' }} />
-                      <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', fontFamily: "'DM Mono',monospace", letterSpacing: '0.05em' }}>{alert.alert_id}</div>
-                    </div>
-                    <div style={{ fontSize: 11, color: '#ffffff4a' }}>Received {formatAlertTime(alert.created_at)}</div>
-                  </div>
-                  <div style={{ padding: '6px 10px', borderRadius: 999, background: `${accent}12`, border: `1px solid ${accent}22`, color: accent, fontSize: 10, fontWeight: 800, letterSpacing: '0.08em' }}>{status.toUpperCase()}</div>
-                </div>
-
-                <div style={{ display: 'grid', gap: 10, marginBottom: 12 }}>
-                  <div style={{ background: '#ffffff06', border: '1px solid #ffffff08', borderRadius: 14, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 9, color: '#ffffff33', fontWeight: 700, letterSpacing: '0.12em', marginBottom: 6 }}>LOCATION</div>
-                    {alert.location_lat != null && alert.location_lng != null ? (
-                      <>
-                        <div style={{ fontSize: 13, color: '#fff', fontFamily: "'DM Mono',monospace" }}>{alert.location_lat}, {alert.location_lng}</div>
-                        <a href={`https://www.google.com/maps?q=${alert.location_lat},${alert.location_lng}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', marginTop: 8, color: '#7dd3fc', fontSize: 11, fontWeight: 600, textDecoration: 'none' }}>Open in Google Maps ↗</a>
-                      </>
-                    ) : (
-                      <div style={{ fontSize: 12, color: '#ffffff55' }}>Precise GPS unavailable. Dispatch as general SOS.</div>
-                    )}
-                  </div>
-                  {alert.resolved_by && <div style={{ fontSize: 11, color: '#ffffff40' }}>Officer: <span style={{ color: '#ffffff70' }}>{alert.resolved_by}</span></div>}
-                </div>
-
-                {status !== 'resolved' && (
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <button onClick={() => handleRespond(alert.alert_id)} disabled={isBusy || isResponding} style={{ flex: 1, padding: '12px 14px', borderRadius: 14, border: 'none', background: isResponding ? '#4b340c' : '#ffb020', color: isResponding ? '#ffd992' : '#1f1404', fontSize: 12, fontWeight: 800, cursor: isBusy || isResponding ? 'not-allowed' : 'pointer' }}>
-                      {isResponding ? 'RESPONDING' : isBusy ? 'UPDATING...' : 'RESPOND'}
-                    </button>
-                    <button onClick={() => handleResolve(alert.alert_id)} disabled={isBusy} style={{ flex: 1, padding: '12px 14px', borderRadius: 14, border: '1px solid #ffffff14', background: '#ffffff08', color: '#fff', fontSize: 12, fontWeight: 800, cursor: isBusy ? 'not-allowed' : 'pointer' }}>
-                      {isBusy ? 'UPDATING...' : 'RESOLVED'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#05070b', color: '#fff', fontFamily: "'Poppins',sans-serif" }}>
-      <div style={{ padding: '18px 20px 16px', borderBottom: '1px solid #ffffff08', background: 'linear-gradient(180deg,rgba(40,8,12,0.92) 0%,rgba(5,7,11,0.98) 100%)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em' }}>Live Emergencies</div>
-            <div style={{ fontSize: 11, color: '#ffffff55', marginTop: 4 }}>Realtime SOS feed for officer response and closure.</div>
-          </div>
-          <button onClick={onBack} style={{ padding: '10px 14px', background: '#ffffff08', border: '1px solid #ffffff12', borderRadius: 14, color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Back</button>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 10 }}>
-          {[
-            { label: 'Unresolved', value: unresolvedCount, color: '#e8474f', bg: '#e8474f12', border: '#e8474f22' },
-            { label: 'Active', value: activeAlerts.length, color: '#ffb4bc', bg: '#ffffff08', border: '#ffffff12' },
-            { label: 'Responding', value: respondingAlerts.length, color: '#ffcf70', bg: '#ffffff08', border: '#ffffff12' },
-          ].map(stat => (
-            <div key={stat.label} style={{ background: stat.bg, border: `1px solid ${stat.border}`, borderRadius: 16, padding: '12px 14px' }}>
-              <div style={{ fontSize: 10, color: '#ffffff55', fontWeight: 700, letterSpacing: '0.12em', marginBottom: 6 }}>{stat.label}</div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: stat.color }}>{stat.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ padding: '14px 20px 10px', display: 'flex', gap: 10, borderBottom: '1px solid #ffffff06' }}>
-        <button onClick={() => setView('live')} style={{ flex: 1, padding: '12px 14px', borderRadius: 14, border: `1px solid ${view === 'live' ? '#e8474f33' : '#ffffff12'}`, background: view === 'live' ? '#1b0a0e' : '#0c0f14', color: view === 'live' ? '#fff' : '#ffffff66', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-          SOS Alerts {unresolvedCount > 0 ? `(${unresolvedCount})` : ''}
-        </button>
-        <button onClick={() => setView('history')} style={{ flex: 1, padding: '12px 14px', borderRadius: 14, border: `1px solid ${view === 'history' ? '#9aa4b233' : '#ffffff12'}`, background: view === 'history' ? '#12161d' : '#0c0f14', color: view === 'history' ? '#fff' : '#ffffff66', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-          History ({resolvedAlerts.length})
-        </button>
-      </div>
-
-      <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px 28px' }}>
-        {loading && <div style={{ padding: '30px 0', textAlign: 'center', color: '#ffffff55' }}><span style={{ display: 'inline-block', marginRight: 8, animation: 'spin 1s linear infinite' }}>◌</span>Loading SOS alerts...</div>}
-        {!loading && view === 'live' && (
-          <>
-            {!unresolvedCount && <div style={{ padding: '26px 20px', textAlign: 'center', borderRadius: 18, background: '#0c0f14', border: '1px solid #ffffff08', color: '#ffffff55' }}>No live SOS alerts right now.</div>}
-            <Section title="Active Alerts" subtitle="Highest priority and newest emergencies" items={activeAlerts} tone="active" />
-            <Section title="Responding" subtitle="Acknowledged by an officer and in progress" items={respondingAlerts} tone="responding" />
-          </>
-        )}
-        {!loading && view === 'history' && (
-          <>
-            {!resolvedAlerts.length && <div style={{ padding: '26px 20px', textAlign: 'center', borderRadius: 18, background: '#0c0f14', border: '1px solid #ffffff08', color: '#ffffff55' }}>Resolved SOS history will appear here.</div>}
-            <Section title="Resolved Alerts" subtitle="Recently closed emergencies" items={resolvedAlerts} tone="resolved" />
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════
 function MapPage({ onSOS, onComplaint, onMap, onTrack, activeTab, sosAnim, onPinChange }) {
   const [pin, setPin] = useState(null); const [nearby, setNearby] = useState([]); const [dest, setDest] = useState(null); const [routeData, setRouteData] = useState(null); const [loading, setLoading] = useState(false); const [navigating, setNavigating] = useState(false); const [stepIndex, setStepIndex] = useState(0); const [showUnsafe, setShowUnsafe] = useState(true); const [safePlaces, setSafePlaces] = useState(STATIC_SAFE_PLACES); const [unsafeZones, setUnsafeZones] = useState(STATIC_UNSAFE_ZONES); const [newsLoading, setNewsLoading] = useState(false); const [placesLoading, setPlacesLoading] = useState(false); const [dataStatus, setDataStatus] = useState({ places: 'static', news: 'static' }); const [mapReady, setMapReady] = useState(false); const newsFetched = useRef(false);
   const [showArrival, setShowArrival] = useState(false); const [arrivedDest, setArrivedDest] = useState('');
@@ -1381,30 +1168,7 @@ export default function App() {
   const [page, setPage] = useState('landing'); const [showSOS, setShowSOS] = useState(false); const [sosAnim, setSosAnim] = useState(false);
   const [splashDone, setSplashDone] = useState(true);
   const [sosFallbackLocation, setSOSFallbackLocation] = useState(null);
-  const [activeSOSCount, setActiveSOSCount] = useState(0);
 
-  useEffect(() => {
-    let mounted = true;
-    async function refreshSOSCount() {
-      const { count, error } = await supabase.from('sos_alerts').select('*', { count: 'exact', head: true }).in('status', ['active', 'responding']);
-      if (error) {
-        console.error('[SOS] Count fetch failed:', error);
-        return;
-      }
-      if (mounted) setActiveSOSCount(count || 0);
-    }
-
-    refreshSOSCount();
-    const channel = supabase
-      .channel('sos-count')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sos_alerts' }, () => { refreshSOSCount(); })
-      .subscribe();
-
-    return () => {
-      mounted = false;
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const triggerSOS = () => {
     setSosAnim(true); setTimeout(() => setSosAnim(false), 700);
@@ -1412,12 +1176,11 @@ export default function App() {
   };
   return (<PhoneFrame><Styles />
     {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
-    {page === 'landing' && <LandingPage onEnter={() => setPage('home')} onPolicePortal={() => setPage('police')} fallbackLocation={sosFallbackLocation} activeSOSCount={activeSOSCount} />}
+    {page === 'landing' && <LandingPage onEnter={() => setPage('home')} fallbackLocation={sosFallbackLocation} />}
     {page === 'home' && <MapPage activeTab="map" onSOS={triggerSOS} onComplaint={() => setPage('complaint')} onMap={() => { }} onTrack={() => setPage('track')} sosAnim={sosAnim} onPinChange={setSOSFallbackLocation} />}
     {page === 'complaint' && <div style={{ height: '100%', position: 'relative' }}><ComplaintPage onBack={() => setPage('home')} /><BottomNav activeTab="complaint" onMap={() => setPage('home')} onComplaint={() => { }} onTrack={() => setPage('track')} /></div>}
     {page === 'track' && <TrackPage activeTab="track" onMap={() => setPage('home')} onComplaint={() => setPage('complaint')} onTrack={() => { }} />}
-    {page === 'police' && <PolicePortalPage onBack={() => setPage('landing')} />}
-    {page !== 'landing' && page !== 'police' && (
+    {page !== 'landing' && (
       <>
         <button onClick={triggerSOS} style={{ position: 'absolute', top: 12, right: 16, zIndex: 1200, width: 56, height: 56, borderRadius: '50%', background: '#CE2029', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px #CE202966', animation: sosAnim ? 'sosNavBounce 0.6s ease' : 'none', cursor: 'pointer' }}>
           <span style={{ color: '#fff', fontSize: 14, fontWeight: 900, fontFamily: "'Poppins',sans-serif", letterSpacing: '0.02em' }}>SOS</span>
